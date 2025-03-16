@@ -1,28 +1,31 @@
+import { QueryClient } from "@tanstack/react-query";
 import type { ReactNode } from 'react'
 import {
   Outlet,
-  createRootRoute,
+  createRootRouteWithContext,
   HeadContent,
   Scripts,
 } from '@tanstack/react-router'
 
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'Beacon, NY Community Calendar',
-      },
-    ],
-  }),
-  component: RootComponent,
-})
+export const Route = createRootRouteWithContext<{
+    queryClient: QueryClient;
+  }>()({
+    head: () => ({
+      meta: [
+        {
+          charSet: "utf-8",
+        },
+        {
+          name: "viewport",
+          content: "width=device-width, initial-scale=1",
+        },
+        {
+          title: "Beacon Digest",
+        },
+      ],
+    }),
+    component: RootComponent,
+  });
 
 function RootComponent() {
   return (

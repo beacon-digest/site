@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import mantineCssUrl from "@mantine/core/styles.css?url";
+import { Layout } from "../components/Layout";
 
 const theme = createTheme({});
 
@@ -41,7 +42,9 @@ function RootComponent() {
   return (
     <RootDocument>
       <MantineProvider theme={theme}>
-        <Outlet />
+        <Layout>
+          <Outlet />
+        </Layout>
       </MantineProvider>
     </RootDocument>
   );

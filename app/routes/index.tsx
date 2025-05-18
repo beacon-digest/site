@@ -56,6 +56,11 @@ function Home() {
 
   return (
     <div className="p-4">
+      {/* Tailwind CSS Test */}
+      <div className="bg-blue-500 text-white p-4 rounded-lg shadow-lg mb-4">
+        This element should have a blue background if Tailwind CSS is working
+      </div>
+
       <Title order={2} mb="md">
         Upcoming Events
       </Title>
@@ -89,6 +94,9 @@ function Home() {
                   }}
                 >
                   {dateGroup.displayDate}
+                  <span className="text-sm text-red-500">
+                    {dateGroup.events.length} events
+                  </span>
                 </Title>
 
                 <Timeline
@@ -108,7 +116,7 @@ function Home() {
                             <Text fw={500} size="lg">
                               {event.name}
                             </Text>
-                            <Badge color={isPast ? "blue" : "gray.3"}>
+                            <Badge color={isPast ? "blue" : "gray"}>
                               {formatTime(event.startDate)}
                               {event.endDate &&
                                 ` - ${formatTime(event.endDate)}`}

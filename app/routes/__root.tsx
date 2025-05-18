@@ -8,6 +8,7 @@ import {
 } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import mantineCssUrl from "@mantine/core/styles.css?url";
+import appCssUrl from "../styles/app.css?url";
 import { Layout } from "../components/Layout";
 
 const theme = createTheme({});
@@ -32,6 +33,10 @@ export const Route = createRootRouteWithContext<{
       {
         rel: "stylesheet",
         href: mantineCssUrl,
+      },
+      {
+        rel: "stylesheet",
+        href: appCssUrl,
       },
     ],
   }),

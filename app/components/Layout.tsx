@@ -1,63 +1,36 @@
-import { useState } from "react";
 import type { ReactNode } from "react";
-import {
-  AppShell,
-  Burger,
-  Group,
-  Title,
-  Divider,
-  NavLink,
-  Text,
-} from "@mantine/core";
+import { AppShell, Group } from "@mantine/core";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
 export function Layout({ children }: LayoutProps) {
-  const [opened, setOpened] = useState(false);
-
   return (
     <AppShell
-      header={{ height: 60 }}
-      navbar={{
-        width: 300,
-        breakpoint: "sm",
-        collapsed: { mobile: !opened },
+      withBorder
+      header={{ height: 80 }}
+      styles={{
+        header: {
+          borderBottom: "1px solid var(--color-neutral-300)",
+          fontFamily: "var(--font-libre-franklin)",
+        },
+        main: {
+          fontFamily: "var(--font-libre-franklin)",
+        },
       }}
-      padding="md"
     >
-      <AppShell.Header p="md">
-        <Group justify="space-between">
-          <Group>
-            <Burger
-              opened={opened}
-              onClick={() => setOpened((o) => !o)}
-              hiddenFrom="sm"
-              size="sm"
-            />
-            <Title order={3}>Beacon Digest Calendar</Title>
-          </Group>
+      <AppShell.Header className="flex items-center justify-between px-12">
+        <h1 className="text-2xl font-extrabold font-hepta-slab">
+          Beacon Digest
+        </h1>
+
+        <Group gap="xl">
+          <div className="text-sm font-semibold">Home</div>
+          <div className="text-sm font-semibold">Events</div>
+          <div className="text-sm font-semibold">About</div>
         </Group>
       </AppShell.Header>
-
-      <AppShell.Navbar p="md">
-        <AppShell.Section>
-          <Text fw={500} size="sm" mb="xs">
-            VIEWS
-          </Text>
-        </AppShell.Section>
-        <Divider mb="sm" />
-        <AppShell.Section grow>
-          <NavLink label="Events" active />
-          <NavLink label="Locations" />
-        </AppShell.Section>
-        <Divider my="sm" />
-        <AppShell.Section>
-          <NavLink label="Settings" />
-        </AppShell.Section>
-      </AppShell.Navbar>
-
       <AppShell.Main>{children}</AppShell.Main>
     </AppShell>
   );

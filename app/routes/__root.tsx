@@ -38,6 +38,14 @@ export const Route = createRootRouteWithContext<{
         rel: "stylesheet",
         href: appCssUrl,
       },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Hepta+Slab:wght@800&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Libre+Franklin:wght500;600;800&display=swap",
+      },
     ],
   }),
   component: RootComponent,

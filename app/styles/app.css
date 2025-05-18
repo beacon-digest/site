@@ -1,1 +1,6 @@
-@import "tailwindcss" source("../");
+@import "tailwindcss";
+
+@theme {
+  --font-hepta-slab: "Hepta Slab", serif;
+  --font-libre-franklin: "Libre Franklin", sans-serif;
+}

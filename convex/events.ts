@@ -11,27 +11,30 @@ export const get = query({
   },
 });
 
-// Query to get events within a specified date range, with location data included
-export const getEventsByDateRange = query({
+// Query to get events for a specific date, with location data included
+export const getEventsByDate = query({
   args: {
-    startDate: v.number(), // Unix timestamp for range start
-    endDate: v.number(), // Unix timestamp for range end
+    date: v.string(), // ISO date string (YYYY-MM-DD)
   },
   handler: async (ctx, args) => {
-    // Get events in date range sorted by start date
+    // Convert the date string to start and end timestamps for the day
+    const startDate = new Date(args.date);
+    const endDate = new Date(args.date);
+    endDate.setDate(endDate.getDate() + 1);
+
+    // Get events for the specified date
     const events = await ctx.db
       .query("events")
       .filter((q) =>
         q.and(
-          q.gte(q.field("startDate"), args.startDate),
-          q.lte(q.field("startDate"), args.endDate)
-        )
+          q.gte(q.field("startDate"), startDate.getTime()),
+          q.lt(q.field("startDate"), endDate.getTime()),
+        ),
       )
       .order("asc")
       .collect();
 
     // Efficiently get all referenced locations in one batch
-    // First, collect unique location IDs
     const locationIds = new Set<Id<"locations">>();
     for (const event of events) {
       if (event.locationId) {
@@ -50,48 +53,21 @@ export const getEventsByDateRange = query({
       }
     }
 
-    // Group by date (using date string as key)
-    const eventsByDate: Record<
-      string,
-      {
-        date: number;
-        displayDate: string;
-        events: Array<Doc<"events"> & { location: Doc<"locations"> | null }>;
-      }
-    > = {};
+    // Add location data to each event
+    const eventsWithLocations = events.map((event) => ({
+      ...event,
+      location: event.locationId ? locationsMap[event.locationId] : null,
+    }));
 
-    for (const event of events) {
-      // Convert timestamp to date string (e.g., "2025-03-17")
-      const date = new Date(event.startDate);
-      const dateString = date.toISOString().split("T")[0];
-
-      // Create the date entry if it doesn't exist
-      if (!eventsByDate[dateString]) {
-        eventsByDate[dateString] = {
-          date: event.startDate, // Store timestamp for sorting
-          displayDate: date.toLocaleDateString(undefined, {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          }),
-          events: [],
-        };
-      }
-
-      // Add the event with its location data
-      eventsByDate[dateString].events.push({
-        ...event,
-        // Attach the location data directly to avoid additional lookups
-        location: event.locationId ? locationsMap[event.locationId] : null,
-      });
-    }
-
-    // Convert to array and sort by date
-    const sortedDates = Object.values(eventsByDate).sort(
-      (a, b) => a.date - b.date
-    );
-
-    return sortedDates;
+    return {
+      date: startDate.getTime(),
+      displayDate: startDate.toLocaleDateString(undefined, {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      events: eventsWithLocations,
+    };
   },
 });

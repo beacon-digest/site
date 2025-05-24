@@ -1,5 +1,5 @@
-import { ActionIcon, Group, Paper, Text, rem } from "@mantine/core";
-import { Link } from "@tanstack/react-router";
+import { ActionIcon, Group, Paper, rem } from "@mantine/core";
+import { Link, useNavigate } from "@tanstack/react-router";
 import {
   addDays,
   differenceInWeeks,
@@ -16,8 +16,8 @@ interface DayNavbarProps {
 }
 
 export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
-  // We want to calculate the initial offset based on the selected date and the current week's start date.
-  // This allows us to display the selected date's week in the navbar on page load.
+  const navigate = useNavigate();
+
   const calculateInitialOffset = () => {
     if (!selectedDate) return 0;
 
@@ -25,6 +25,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
       const selected = parseISO(selectedDate);
       const currentWeekStart = startOfWeek(new Date());
       const selectedWeekStart = startOfWeek(selected);
+
       return differenceInWeeks(selectedWeekStart, currentWeekStart);
     } catch {
       return 0;
@@ -34,6 +35,26 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
   const [weekOffset, setWeekOffset] = useState(calculateInitialOffset);
   const baseDate = startOfWeek(addDays(new Date(), weekOffset * 7));
   const daysToDisplay = 7;
+
+  const handlePreviousWeek = () => {
+    setWeekOffset((prev) => prev - 1);
+
+    // Navigate to previous week's Saturday (last day of previous week)
+    const previousWeekSaturday = addDays(baseDate, -1);
+    const formattedDate = format(previousWeekSaturday, "yyyy-MM-dd");
+
+    navigate({ to: `/${formattedDate}` });
+  };
+
+  const handleNextWeek = () => {
+    setWeekOffset((prev) => prev + 1);
+
+    // Navigate to next week's Sunday (first day of next week)
+    const nextWeekSunday = addDays(baseDate, 7);
+    const formattedDate = format(nextWeekSunday, "yyyy-MM-dd");
+
+    navigate({ to: `/${formattedDate}` });
+  };
 
   const dateLinks = Array.from({ length: daysToDisplay }, (_, i) => {
     const date = addDays(baseDate, i);
@@ -70,21 +91,13 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
 
   return (
     <Group justify="space-between" className="py-8">
-      <ActionIcon
-        variant="subtle"
-        onClick={() => setWeekOffset((prev) => prev - 1)}
-        size="lg"
-      >
+      <ActionIcon variant="subtle" onClick={handlePreviousWeek} size="lg">
         <IconChevronLeft />
       </ActionIcon>
 
       {dateLinks}
 
-      <ActionIcon
-        variant="subtle"
-        onClick={() => setWeekOffset((prev) => prev + 1)}
-        size="lg"
-      >
+      <ActionIcon variant="subtle" onClick={handleNextWeek} size="lg">
         <IconChevronRight />
       </ActionIcon>
     </Group>

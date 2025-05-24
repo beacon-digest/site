@@ -1,11 +1,14 @@
+import { CalendarEvent } from "../../db/types/calendar-event";
 import { DayNavbar } from "./DayNavbar";
-import { Event } from "./Event";
+import { Event } from "../components/Event";
 
 interface HomeProps {
-  date?: string;
+  date: string;
+  events: CalendarEvent[];
 }
 
-export const Home: React.FC<HomeProps> = ({ date }) => {
+export const Home: React.FC<HomeProps> = ({ date, events }) => {
+  console.log({ events });
   return (
     <div className="px-12">
       <DayNavbar selectedDate={date} />
@@ -25,7 +28,7 @@ export const Home: React.FC<HomeProps> = ({ date }) => {
       />
       <Event
         emoji="🧣"
-        title="Knit a Sampler Scart (First Class)"
+        title="Knit a Sampler Scarf (First Class)"
         location="Beetle and Fred"
         address="217 Main St"
         time="10:00 AM - 12:00 PM"

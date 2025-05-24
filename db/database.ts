@@ -3,7 +3,7 @@ import { NeonDialect } from "kysely-neon";
 import ws from "ws";
 import { CalendarEvent } from "./types/calendar-event";
 
-interface Database {
+export interface Database {
   events: CalendarEvent;
 }
 

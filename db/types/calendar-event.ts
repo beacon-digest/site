@@ -4,6 +4,7 @@ export interface CalendarEvent {
   emoji: string | null;
   slug: string | null;
   description: string | null;
+  external_id: string | null;
   start_at: Date | null;
   end_at: Date | null;
   created_at: Date;

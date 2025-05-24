@@ -11,8 +11,10 @@ export const EmojiBox: React.FC<EmojiBoxProps> = ({ emoji }) => {
 
   useEffect(() => {
     getEmojiColors(emoji).then((colors) => {
-      const gradient = `linear-gradient(135deg, ${colors.join(", ")})`;
-      setBackground(gradient);
+      if (colors.length > 0) {
+        const gradient = `linear-gradient(135deg, ${colors.join(", ")})`;
+        setBackground(gradient);
+      }
     });
   }, [emoji]);
 

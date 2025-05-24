@@ -40,6 +40,7 @@ export const getEvents = createServerFn()
         .selectAll()
         .where("start_at", ">=", dayStart)
         .where("start_at", "<=", dayEnd)
+        .orderBy("start_at", "asc")
         .execute();
     } catch (error) {
       console.error(`Error processing date ${date}:`, error);

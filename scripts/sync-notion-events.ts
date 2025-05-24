@@ -1,5 +1,4 @@
 import { Client } from "@notionhq/client";
-import { CalendarEvent } from "../db/types/calendar-event.js";
 import { toZonedTime } from "date-fns-tz";
 import { addDays, formatISO, startOfDay } from "date-fns";
 import { NeonDialect } from "kysely-neon";
@@ -118,7 +117,7 @@ async function syncNotionEvents(dateString: string) {
             .replace(/^-|-$/g, "")
         : null;
 
-      const eventData: Omit<CalendarEvent, "id" | "created_at"> = {
+      const eventData = {
         name,
         emoji,
         slug,

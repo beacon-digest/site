@@ -14,11 +14,7 @@ export const Home: React.FC<HomeProps> = ({ date, events }) => (
     {events.map((event) => (
       <Event
         key={event.id}
-        emoji={event.emoji ?? ""}
-        title={event.name ?? ""}
-        location={"Cool place"}
-        address={"123 Rad Street"}
-        time={"8:00 AM - 3:00 PM"}
+        event={event}
       />
     ))}
   </div>

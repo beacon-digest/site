@@ -33,6 +33,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
   };
 
   const [weekOffset, setWeekOffset] = useState(calculateInitialOffset);
+  const [hoveredDay, setHoveredDay] = useState<string | null>(null);
   const baseDate = startOfWeek(addDays(new Date(), weekOffset * 7));
   const daysToDisplay = 7;
 
@@ -67,14 +68,21 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
       <Link key={i} to={path} style={{ textDecoration: "none" }}>
         <Paper
           p="xs"
+          onMouseEnter={() => setHoveredDay(formattedDate)}
+          onMouseLeave={() => setHoveredDay(null)}
           style={{
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: isCurrentDay ? "#e9ecef" : "white",
+            backgroundColor: isCurrentDay 
+              ? "#e9ecef" 
+              : hoveredDay === formattedDate 
+                ? "#f8f9fa" 
+                : "white",
             minWidth: rem(100),
             cursor: "pointer",
+            transition: "background-color 0.2s ease",
           }}
         >
           <h2 className="text-center text-3xl mb-1 font-extrabold">

@@ -1,4 +1,4 @@
-import { Box, Text } from "@mantine/core";
+import { Box } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { getEmojiColors } from "../utils/color";
 

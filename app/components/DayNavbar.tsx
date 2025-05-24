@@ -1,15 +1,37 @@
 import { ActionIcon, Group, Paper, Text, rem } from "@mantine/core";
-import { Link, useParams } from "@tanstack/react-router";
-import { addDays, format, isToday, startOfWeek } from "date-fns";
+import { Link } from "@tanstack/react-router";
+import {
+  addDays,
+  differenceInWeeks,
+  format,
+  isToday,
+  parseISO,
+  startOfWeek,
+} from "date-fns";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { useState } from "react";
 
 interface DayNavbarProps {
-  selectedDate: string | undefined;
+  selectedDate: string;
 }
 
 export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
-  const [weekOffset, setWeekOffset] = useState(0);
+  // We want to calculate the initial offset based on the selected date and the current week's start date.
+  // This allows us to display the selected date's week in the navbar on page load.
+  const calculateInitialOffset = () => {
+    if (!selectedDate) return 0;
+
+    try {
+      const selected = parseISO(selectedDate);
+      const currentWeekStart = startOfWeek(new Date());
+      const selectedWeekStart = startOfWeek(selected);
+      return differenceInWeeks(selectedWeekStart, currentWeekStart);
+    } catch {
+      return 0;
+    }
+  };
+
+  const [weekOffset, setWeekOffset] = useState(calculateInitialOffset);
   const baseDate = startOfWeek(addDays(new Date(), weekOffset * 7));
   const daysToDisplay = 7;
 
@@ -18,9 +40,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
     const formattedDate = format(date, "yyyy-MM-dd");
     const path = isToday(date) ? "/" : `/${formattedDate}`;
 
-    // If we're at root (/), use isToday logic
-    // Otherwise, compare with the URL date parameter
-    const isCurrentDay = !date ? isToday(date) : formattedDate === selectedDate;
+    const isCurrentDay = formattedDate === selectedDate;
 
     return (
       <Link key={i} to={path} style={{ textDecoration: "none" }}>

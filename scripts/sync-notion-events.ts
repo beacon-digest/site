@@ -154,6 +154,8 @@ async function syncNotionEvents(dateString: string) {
     console.error("Error syncing Notion events:", error);
     process.exit(1);
   }
+
+  process.exit(0);
 }
 
 // Get date from command line arguments

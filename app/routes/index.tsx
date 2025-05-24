@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { getEvents } from "../server/events";
 
 const loader = async () => ({
-  events: await getEvents(),
+  events: await getEvents({ data: format(new Date(), "yyyy-MM-dd") }),
 });
 
 const IndexContainer = () => {

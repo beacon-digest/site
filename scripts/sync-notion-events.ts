@@ -6,6 +6,8 @@ import ws from "ws";
 import { Kysely } from "kysely";
 import { Database } from "../db/database";
 import { config } from "dotenv";
+import { NotionToMarkdown } from "notion-to-md";
+import Showdown from "showdown";
 
 config({ path: ".env.local" });
 
@@ -54,6 +56,8 @@ async function syncNotionEvents(dateString: string) {
   }
 
   const notion = new Client({ auth: notionApiKey });
+  const n2m = new NotionToMarkdown({ notionClient: notion });
+  const converter = new Showdown.Converter();
   const db = new Kysely<Database>({
     dialect,
   });
@@ -99,10 +103,31 @@ async function syncNotionEvents(dateString: string) {
       const emoji =
         notionEvent.icon?.type === "emoji" ? notionEvent.icon.emoji : null;
 
-      const description =
-        notionEvent.properties.Description?.rich_text
-          ?.map((item) => item.plain_text)
-          .join("") || null;
+      // Get page content as markdown and convert to HTML
+      let description = null;
+      try {
+        const mdBlocks = await n2m.pageToMarkdown(notionEvent.id);
+        const mdString = n2m.toMarkdownString(mdBlocks);
+        
+        // Handle different return types from toMarkdownString
+        let markdownContent = '';
+        if (typeof mdString === 'string') {
+          markdownContent = mdString;
+        } else if (mdString && typeof mdString === 'object' && 'parent' in mdString && typeof mdString.parent === 'string') {
+          markdownContent = mdString.parent;
+        }
+        
+        if (markdownContent && markdownContent.trim()) {
+          description = converter.makeHtml(markdownContent);
+        }
+      } catch (error) {
+        console.warn(`Failed to convert page content for ${notionEvent.id}:`, error);
+        // Fallback to simple text extraction
+        description =
+          notionEvent.properties.Description?.rich_text
+            ?.map((item) => item.plain_text)
+            .join("") || null;
+      }
 
       const dateData = notionEvent.properties.Date?.date;
       const startAt = dateData?.start ? new Date(dateData.start) : null;

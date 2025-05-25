@@ -18,10 +18,10 @@ importers:
         specifier: 1.0.0
         version: 1.0.0
       '@notionhq/client':
-        specifier: ^3.1.2
+        specifier: 3.1.2
         version: 3.1.2
       '@tabler/icons-react':
-        specifier: ^3.33.0
+        specifier: 3.33.0
         version: 3.33.0(react@19.0.0)
       '@tailwindcss/vite':
         specifier: 4.0.14
@@ -38,6 +38,9 @@ importers:
       '@tanstack/react-start':
         specifier: 1.114.22
         version: 1.114.22(@tanstack/react-router@1.114.22(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(@types/node@22.13.10)(db0@0.3.1)(ioredis@5.6.0)(jiti@2.4.2)(lightningcss@1.29.2)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.0)(tsx@4.19.4)(typescript@5.8.2)(vite@6.2.2(@types/node@22.13.10)(jiti@2.4.2)(lightningcss@1.29.2)(sugarss@4.0.1(postcss@8.5.3))(terser@5.39.0)(tsx@4.19.4))
+      '@types/showdown':
+        specifier: 2.0.6
+        version: 2.0.6
       '@types/ws':
         specifier: 8.18.1
         version: 8.18.1
@@ -45,7 +48,7 @@ importers:
         specifier: 4.1.0
         version: 4.1.0
       date-fns-tz:
-        specifier: ^3.2.0
+        specifier: 3.2.0
         version: 3.2.0(date-fns@4.1.0)
       dotenv:
         specifier: 16.5.0
@@ -56,17 +59,23 @@ importers:
       kysely-neon:
         specifier: 1.3.0
         version: 1.3.0(@neondatabase/serverless@1.0.0)(kysely@0.28.2)(ws@8.18.2)
+      notion-to-md:
+        specifier: ^3.1.9
+        version: 3.1.9
       react:
         specifier: 19.0.0
         version: 19.0.0
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
+      showdown:
+        specifier: 2.1.0
+        version: 2.1.0
       tailwindcss:
         specifier: 4.0.14
         version: 4.0.14
       tsx:
-        specifier: ^4.19.4
+        specifier: 4.19.4
         version: 4.19.4
       vinxi:
         specifier: 0.5.3
@@ -1555,6 +1564,9 @@ packages:
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
 
+  '@types/showdown@2.0.6':
+    resolution: {integrity: sha512-pTvD/0CIeqe4x23+YJWlX2gArHa8G0J0Oh6GKaVXV7TAeickpkkZiNOgFcFcmLQ5lB/K0qBJL1FtRYltBfbGCQ==}
+
   '@types/ws@8.18.1':
     resolution: {integrity: sha512-ThVF6DCVhA8kUGy+aazFQ4kXQ7E1Ty7A3ypFOe0IcJV8O/M511G99AW24irKrW56Wt44yG9+ij8FaqoBGkuBXg==}
 
@@ -1779,6 +1791,10 @@ packages:
 
   commander@2.20.3:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
+
+  commander@9.5.0:
+    resolution: {integrity: sha512-KRs7WVDKg86PWiuAqhDrAQnTXZKraVcCc6vFdL14qrZ/DcWwuRo7VoiYXalXO7S5GKpqYiVEwCbgFDfxNHKJBQ==}
+    engines: {node: ^12.20.0 || >=14}
 
   commondir@1.0.1:
     resolution: {integrity: sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==}
@@ -2483,6 +2499,9 @@ packages:
   magicast@0.3.5:
     resolution: {integrity: sha512-L0WhttDl+2BOsybvEOLK7fW3UA0OQ0IQ2d6Zl2x/a6vVRs3bAY0ECOSHHeL5jD+SbOpOCUEi0y1DgHEn9Qn1AQ==}
 
+  markdown-table@2.0.0:
+    resolution: {integrity: sha512-Ezda85ToJUBhM6WGaG6veasyym+Tbs3cMAw/ZhOPqXiYsr0jgocBV3j3nx+4lk47plLlIqjwuTm/ywVI+zjJ/A==}
+
   merge-stream@2.0.0:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
 
@@ -2599,6 +2618,10 @@ packages:
   normalize-range@0.1.2:
     resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
+
+  notion-to-md@3.1.9:
+    resolution: {integrity: sha512-SsYhhigh+jOv06QOiFynOQATPMl96CspWDIL3Q5klzp4eaZ1dYaPI3ELoly80G1K0jf730u3ItvfwskzPKK41g==}
+    engines: {node: '>=12'}
 
   npm-run-path@5.3.0:
     resolution: {integrity: sha512-ppwTtiJZq0O/ai0z7yfudtBpWIoxM8yE6nHi1X47eFR2EWORqfbu6CnPlNsjeN683eT0qG6H/Pyf9fCcvjnnnQ==}
@@ -2895,6 +2918,10 @@ packages:
   regenerator-runtime@0.14.1:
     resolution: {integrity: sha512-dYnhHh0nJoMfnkZs6GmmhFknAGRrLznOu5nc9ML+EJxGvrx6H7teuevqVqCuPcPK//3eDrrjQhehXVx9cnkGdw==}
 
+  repeat-string@1.6.1:
+    resolution: {integrity: sha512-PV0dzCYDNfRi1jCDbJzpW7jNNDRuCOG/jI5ctQcGKt/clZD+YcPS3yIlWuTJMmESC8aevCFmWJy5wjAFgNqN6w==}
+    engines: {node: '>=0.10'}
+
   require-directory@2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
     engines: {node: '>=0.10.0'}
@@ -2992,6 +3019,10 @@ packages:
   shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
+
+  showdown@2.1.0:
+    resolution: {integrity: sha512-/6NVYu4U819R2pUIk79n67SYgJHWCce0a5xTP979WbNp0FL9MN1I1QK662IDU1b6JzKTvmhgI7T7JYIxBi3kMQ==}
+    hasBin: true
 
   signal-exit@4.1.0:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
@@ -5038,6 +5069,8 @@ snapshots:
 
   '@types/resolve@1.20.2': {}
 
+  '@types/showdown@2.0.6': {}
+
   '@types/ws@8.18.1':
     dependencies:
       '@types/node': 22.13.10
@@ -5317,6 +5350,8 @@ snapshots:
   colorette@1.4.0: {}
 
   commander@2.20.3: {}
+
+  commander@9.5.0: {}
 
   commondir@1.0.1: {}
 
@@ -6002,6 +6037,10 @@ snapshots:
       '@babel/types': 7.26.10
       source-map-js: 1.2.1
 
+  markdown-table@2.0.0:
+    dependencies:
+      repeat-string: 1.6.1
+
   merge-stream@2.0.0: {}
 
   merge2@1.4.1: {}
@@ -6176,6 +6215,13 @@ snapshots:
   normalize-path@3.0.0: {}
 
   normalize-range@0.1.2: {}
+
+  notion-to-md@3.1.9:
+    dependencies:
+      markdown-table: 2.0.0
+      node-fetch: 2.7.0
+    transitivePeerDependencies:
+      - encoding
 
   npm-run-path@5.3.0:
     dependencies:
@@ -6456,6 +6502,8 @@ snapshots:
 
   regenerator-runtime@0.14.1: {}
 
+  repeat-string@1.6.1: {}
+
   require-directory@2.1.1: {}
 
   require-from-string@2.0.2: {}
@@ -6570,6 +6618,10 @@ snapshots:
       shebang-regex: 3.0.0
 
   shebang-regex@3.0.0: {}
+
+  showdown@2.1.0:
+    dependencies:
+      commander: 9.5.0
 
   signal-exit@4.1.0: {}
 

@@ -30,13 +30,10 @@ export const Event: React.FC<EventProps> = ({ event }) => {
             <div className="text-gray-500 text-xl">123 Rad Street</div>
           </div>
 
-          <a
-            href="#"
-            className="text-red-600 text-xl flex items-center gap-1 whitespace-nowrap"
-          >
+          <span className="text-red-600 text-xl flex items-center gap-1 whitespace-nowrap">
             Learn more
             <IconArrowRight className="text-black" />
-          </a>
+          </span>
         </div>
       </div>
     </Link>

@@ -17,6 +17,7 @@ export const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
         <Link to="/">
           <Anchor>Home</Anchor>
         </Link>
+
         <Link
           to="/calendar/$date"
           params={{ date: toISODateString(event.start_at ?? new Date()) }}
@@ -25,13 +26,14 @@ export const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
             {format(event.start_at ?? new Date(), "MMMM d, yyyy")}
           </Anchor>
         </Link>
+
         <span>{event.name}</span>
       </Breadcrumbs>
 
-      <Group>
+      <Group wrap="nowrap" align="center">
         <EmojiBox emoji={event.emoji ?? ""} />
 
-        <Stack gap={4}>
+        <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
           <span className="text-gray-700 text-md">
             {formatEventTime(event.start_at, event.end_at)}
           </span>

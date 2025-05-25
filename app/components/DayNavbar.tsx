@@ -44,7 +44,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
     const previousWeekSaturday = addDays(baseDate, -1);
     const formattedDate = format(previousWeekSaturday, "yyyy-MM-dd");
 
-    navigate({ to: `/${formattedDate}` });
+    navigate({ to: "/calendar/$date", params: { date: formattedDate } });
   };
 
   const handleNextWeek = () => {
@@ -54,7 +54,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
     const nextWeekSunday = addDays(baseDate, 7);
     const formattedDate = format(nextWeekSunday, "yyyy-MM-dd");
 
-    navigate({ to: `/${formattedDate}` });
+    navigate({ to: "/calendar/$date", params: { date: formattedDate } });
   };
 
   const dateLinks = Array.from({ length: daysToDisplay }, (_, i) => {

@@ -2,26 +2,13 @@ import { EmojiBox } from "./EmojiBox";
 import { IconArrowRight } from "@tabler/icons-react";
 import { CalendarEvent } from "../../db/types/calendar-event";
 import { Link } from "@tanstack/react-router";
+import { formatEventTime } from "../utils/events";
 
 interface EventProps {
   event: CalendarEvent;
 }
 
 export const Event: React.FC<EventProps> = ({ event }) => {
-  const formatTime = (startAt: Date | null, endAt: Date | null) => {
-    if (!startAt) return "Time TBD";
-
-    const formatOptions: Intl.DateTimeFormatOptions = {
-      hour: "numeric",
-      minute: "2-digit",
-      hour12: true,
-    };
-
-    const startTime = startAt.toLocaleTimeString("en-US", formatOptions);
-    const endTime = endAt?.toLocaleTimeString("en-US", formatOptions);
-
-    return endTime ? `${startTime} - ${endTime}` : startTime;
-  };
   return (
     <Link to="/events/$slug" params={{ slug: event.slug! }}>
       <div className="border-t border-gray-300 py-10">
@@ -30,7 +17,7 @@ export const Event: React.FC<EventProps> = ({ event }) => {
 
           <div className="flex flex-col gap-0">
             <span className="text-gray-700 text-md">
-              {formatTime(event.start_at, event.end_at)}
+              {formatEventTime(event.start_at, event.end_at)}
             </span>
 
             <h2 className="text-[34px] font-extrabold line-clamp-2 leading-12">

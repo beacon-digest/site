@@ -60,7 +60,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
   const dateLinks = Array.from({ length: daysToDisplay }, (_, i) => {
     const date = addDays(baseDate, i);
     const formattedDate = format(date, "yyyy-MM-dd");
-    const path = isToday(date) ? "/" : `/${formattedDate}`;
+    const path = isToday(date) ? "/" : `/calendar/${formattedDate}`;
 
     const isCurrentDay = formattedDate === selectedDate;
 
@@ -75,10 +75,10 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: isCurrentDay 
-              ? "#e9ecef" 
-              : hoveredDay === formattedDate 
-                ? "#f8f9fa" 
+            backgroundColor: isCurrentDay
+              ? "#e9ecef"
+              : hoveredDay === formattedDate
+                ? "#f8f9fa"
                 : "white",
             minWidth: rem(100),
             cursor: "pointer",

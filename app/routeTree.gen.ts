@@ -11,17 +11,10 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
-import { Route as DateImport } from './routes/$date'
 import { Route as IndexImport } from './routes/index'
-import { Route as CalendarIndexImport } from './routes/calendar/index'
+import { Route as CalendarDateImport } from './routes/calendar/$date'
 
 // Create/Update Routes
-
-const DateRoute = DateImport.update({
-  id: '/$date',
-  path: '/$date',
-  getParentRoute: () => rootRoute,
-} as any)
 
 const IndexRoute = IndexImport.update({
   id: '/',
@@ -29,9 +22,9 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const CalendarIndexRoute = CalendarIndexImport.update({
-  id: '/calendar/',
-  path: '/calendar/',
+const CalendarDateRoute = CalendarDateImport.update({
+  id: '/calendar/$date',
+  path: '/calendar/$date',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -46,18 +39,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/$date': {
-      id: '/$date'
-      path: '/$date'
-      fullPath: '/$date'
-      preLoaderRoute: typeof DateImport
-      parentRoute: typeof rootRoute
-    }
-    '/calendar/': {
-      id: '/calendar/'
-      path: '/calendar'
-      fullPath: '/calendar'
-      preLoaderRoute: typeof CalendarIndexImport
+    '/calendar/$date': {
+      id: '/calendar/$date'
+      path: '/calendar/$date'
+      fullPath: '/calendar/$date'
+      preLoaderRoute: typeof CalendarDateImport
       parentRoute: typeof rootRoute
     }
   }
@@ -67,42 +53,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/$date': typeof DateRoute
-  '/calendar': typeof CalendarIndexRoute
+  '/calendar/$date': typeof CalendarDateRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/$date': typeof DateRoute
-  '/calendar': typeof CalendarIndexRoute
+  '/calendar/$date': typeof CalendarDateRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/$date': typeof DateRoute
-  '/calendar/': typeof CalendarIndexRoute
+  '/calendar/$date': typeof CalendarDateRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$date' | '/calendar'
+  fullPaths: '/' | '/calendar/$date'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$date' | '/calendar'
-  id: '__root__' | '/' | '/$date' | '/calendar/'
+  to: '/' | '/calendar/$date'
+  id: '__root__' | '/' | '/calendar/$date'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DateRoute: typeof DateRoute
-  CalendarIndexRoute: typeof CalendarIndexRoute
+  CalendarDateRoute: typeof CalendarDateRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DateRoute: DateRoute,
-  CalendarIndexRoute: CalendarIndexRoute,
+  CalendarDateRoute: CalendarDateRoute,
 }
 
 export const routeTree = rootRoute
@@ -116,18 +97,14 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/$date",
-        "/calendar/"
+        "/calendar/$date"
       ]
     },
     "/": {
       "filePath": "index.tsx"
     },
-    "/$date": {
-      "filePath": "$date.tsx"
-    },
-    "/calendar/": {
-      "filePath": "calendar/index.tsx"
+    "/calendar/$date": {
+      "filePath": "calendar/$date.tsx"
     }
   }
 }

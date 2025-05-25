@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { AppShell, Group } from "@mantine/core";
+import { Link } from "@tanstack/react-router";
 
 interface LayoutProps {
   children: ReactNode;
@@ -21,13 +22,17 @@ export function Layout({ children }: LayoutProps) {
       }}
     >
       <AppShell.Header className="flex items-center justify-between px-12">
-        <h1 className="text-2xl font-extrabold font-hepta-slab">
-          Beacon Digest
-        </h1>
+        <Link to="/">
+          <h1 className="text-2xl font-extrabold font-hepta-slab">
+            Beacon Digest
+          </h1>
+        </Link>
 
         <Group gap="xl">
-          <div className="text-sm font-semibold">Home</div>
-          <div className="text-sm font-semibold">Events</div>
+          <Link to="/" className="text-sm font-semibold">
+            Events
+          </Link>
+
           <div className="text-sm font-semibold">About</div>
         </Group>
       </AppShell.Header>

@@ -12,6 +12,7 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
+import { Route as EventsSlugImport } from './routes/events/$slug'
 import { Route as CalendarDateImport } from './routes/calendar/$date'
 
 // Create/Update Routes
@@ -19,6 +20,12 @@ import { Route as CalendarDateImport } from './routes/calendar/$date'
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const EventsSlugRoute = EventsSlugImport.update({
+  id: '/events/$slug',
+  path: '/events/$slug',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalendarDateImport
       parentRoute: typeof rootRoute
     }
+    '/events/$slug': {
+      id: '/events/$slug'
+      path: '/events/$slug'
+      fullPath: '/events/$slug'
+      preLoaderRoute: typeof EventsSlugImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +68,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/calendar/$date': typeof CalendarDateRoute
+  '/events/$slug': typeof EventsSlugRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/calendar/$date': typeof CalendarDateRoute
+  '/events/$slug': typeof EventsSlugRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/calendar/$date': typeof CalendarDateRoute
+  '/events/$slug': typeof EventsSlugRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/calendar/$date'
+  fullPaths: '/' | '/calendar/$date' | '/events/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/calendar/$date'
-  id: '__root__' | '/' | '/calendar/$date'
+  to: '/' | '/calendar/$date' | '/events/$slug'
+  id: '__root__' | '/' | '/calendar/$date' | '/events/$slug'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CalendarDateRoute: typeof CalendarDateRoute
+  EventsSlugRoute: typeof EventsSlugRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CalendarDateRoute: CalendarDateRoute,
+  EventsSlugRoute: EventsSlugRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +116,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/calendar/$date"
+        "/calendar/$date",
+        "/events/$slug"
       ]
     },
     "/": {
@@ -105,6 +125,9 @@ export const routeTree = rootRoute
     },
     "/calendar/$date": {
       "filePath": "calendar/$date.tsx"
+    },
+    "/events/$slug": {
+      "filePath": "events/$slug.tsx"
     }
   }
 }

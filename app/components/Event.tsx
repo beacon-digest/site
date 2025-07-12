@@ -26,8 +26,21 @@ export const Event: React.FC<EventProps> = ({ event }) => {
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <div className="text-gray-800 text-xl">Cool place</div>
-            <div className="text-gray-500 text-xl">123 Rad Street</div>
+            {event.location && (
+              <>
+                {event.location.name && (
+                  <div className="text-gray-800 text-xl">
+                    {event.location.name}
+                  </div>
+                )}
+
+                {event.location.address && (
+                  <div className="text-gray-500 text-xl">
+                    {event.location.address}
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
           <span className="text-red-600 text-xl flex items-center gap-1 whitespace-nowrap">

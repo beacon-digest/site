@@ -37,11 +37,47 @@ export const getEvents = createServerFn()
 
       return database
         .selectFrom("events")
-        .selectAll()
+        .leftJoin("locations", "events.location_id", "locations.id")
+        .select([
+          "events.id",
+          "events.name",
+          "events.emoji",
+          "events.slug",
+          "events.description",
+          "events.external_id",
+          "events.location_id",
+          "events.start_at",
+          "events.end_at",
+          "events.created_at",
+          "locations.id as location_id_val",
+          "locations.name as location_name",
+          "locations.address as location_address",
+        ])
         .where("start_at", ">=", dayStart)
         .where("start_at", "<=", dayEnd)
         .orderBy("start_at", "asc")
-        .execute();
+        .execute()
+        .then((events) =>
+          events.map((event) => {
+            const {
+              location_id_val,
+              location_name,
+              location_address,
+              ...eventData
+            } = event;
+
+            return {
+              ...eventData,
+              location: location_id_val
+                ? {
+                    id: location_id_val,
+                    name: location_name,
+                    address: location_address,
+                  }
+                : null,
+            };
+          }),
+        );
     } catch (error) {
       console.error(`Error processing date ${date}:`, error);
       throw error;

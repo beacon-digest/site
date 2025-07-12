@@ -9,13 +9,23 @@ export interface EventsTable {
   slug: string | null;
   description: string | null;
   external_id: string | null;
+  location_id: number | null;
   start_at: Date | null;
   end_at: Date | null;
   created_at: Generated<Date>;
 }
 
+export interface LocationsTable {
+  id: Generated<number>;
+  name: string;
+  address: string | null;
+  website: string | null;
+  created_at: Generated<Date>;
+}
+
 export interface Database {
   events: EventsTable;
+  locations: LocationsTable;
 }
 
 let database: Kysely<Database> | undefined;

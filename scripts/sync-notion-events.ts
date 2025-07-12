@@ -22,6 +22,7 @@ interface NotionEvent {
     Emoji?: { rich_text: { plain_text: string }[] };
     Description?: { rich_text: { plain_text: string }[] };
     Date?: { date: { start: string; end?: string } };
+    Location?: { select: { name: string } | null };
     [key: string]: any;
   };
 }
@@ -30,6 +31,64 @@ export const dialect = new NeonDialect({
   connectionString: process.env.VITE_DATABASE_URL,
   webSocketConstructor: ws,
 });
+
+async function parseLocationInfo(locationString: string): Promise<{
+  name: string;
+  address: string | null;
+}> {
+  // Check if location has address in parentheses: "Foo Bar (123 Main Street)"
+  const match = locationString.match(/^(.+?)\s*\((.+)\)$/);
+
+  if (match) {
+    return {
+      name: match[1].trim(),
+      address: match[2].trim(),
+    };
+  }
+
+  // Just the name without address
+  return {
+    name: locationString.trim(),
+    address: null,
+  };
+}
+
+async function findOrCreateLocation(
+  db: Kysely<Database>,
+  locationName: string,
+  address: string | null,
+): Promise<number> {
+  // First, try to find existing location by name
+  const existingLocation = await db
+    .selectFrom("locations")
+    .selectAll()
+    .where("name", "=", locationName)
+    .executeTakeFirst();
+
+  if (existingLocation) {
+    // Update address if it's different and the new one is not null
+    if (address && existingLocation.address !== address) {
+      await db
+        .updateTable("locations")
+        .set({ address })
+        .where("id", "=", existingLocation.id)
+        .execute();
+    }
+    return existingLocation.id;
+  }
+
+  // Create new location
+  const result = await db
+    .insertInto("locations")
+    .values({
+      name: locationName,
+      address,
+    })
+    .returning("id")
+    .executeTakeFirstOrThrow();
+
+  return result.id;
+}
 
 async function syncNotionEvents(dateString: string) {
   // Validate date format
@@ -84,6 +143,8 @@ async function syncNotionEvents(dateString: string) {
       },
     });
 
+    console.log(response.results[0]);
+
     console.log(`Found ${response.results.length} events in Notion`);
 
     for (const page of response.results) {
@@ -103,25 +164,46 @@ async function syncNotionEvents(dateString: string) {
       const emoji =
         notionEvent.icon?.type === "emoji" ? notionEvent.icon.emoji : null;
 
+      // Handle location
+      let locationId: number | null = null;
+      const locationData = notionEvent.properties.Location?.select;
+      if (locationData?.name) {
+        const { name: locationName, address } = await parseLocationInfo(
+          locationData.name,
+        );
+        locationId = await findOrCreateLocation(db, locationName, address);
+        console.log(
+          `Location: ${locationName}${address ? ` (${address})` : ""} [ID: ${locationId}]`,
+        );
+      }
+
       // Get page content as markdown and convert to HTML
       let description = null;
       try {
         const mdBlocks = await n2m.pageToMarkdown(notionEvent.id);
         const mdString = n2m.toMarkdownString(mdBlocks);
-        
+
         // Handle different return types from toMarkdownString
-        let markdownContent = '';
-        if (typeof mdString === 'string') {
+        let markdownContent = "";
+        if (typeof mdString === "string") {
           markdownContent = mdString;
-        } else if (mdString && typeof mdString === 'object' && 'parent' in mdString && typeof mdString.parent === 'string') {
+        } else if (
+          mdString &&
+          typeof mdString === "object" &&
+          "parent" in mdString &&
+          typeof mdString.parent === "string"
+        ) {
           markdownContent = mdString.parent;
         }
-        
+
         if (markdownContent && markdownContent.trim()) {
           description = converter.makeHtml(markdownContent);
         }
       } catch (error) {
-        console.warn(`Failed to convert page content for ${notionEvent.id}:`, error);
+        console.warn(
+          `Failed to convert page content for ${notionEvent.id}:`,
+          error,
+        );
         // Fallback to simple text extraction
         description =
           notionEvent.properties.Description?.rich_text
@@ -148,6 +230,7 @@ async function syncNotionEvents(dateString: string) {
         slug,
         description,
         external_id: externalId,
+        location_id: locationId,
         start_at: startAt,
         end_at: endAt,
       };
@@ -161,7 +244,7 @@ async function syncNotionEvents(dateString: string) {
           .execute();
 
         console.log(
-          `Updated event: ${name || externalId} ${emoji ? `(${emoji})` : ""}`,
+          `Updated event: ${name || externalId} ${emoji ? `(${emoji})` : ""} ${locationId ? `at location ID ${locationId}` : ""}`,
         );
       } else {
         // Insert new event

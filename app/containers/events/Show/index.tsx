@@ -18,6 +18,8 @@ export const EventShow: React.FC<EventShowProps> = ({ event }) => {
           />
         </>
       )}
+
+      {event.location?.name}
     </Container>
   );
 };

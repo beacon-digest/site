@@ -1,6 +1,7 @@
 import { Container } from "@mantine/core";
 import { CalendarEvent } from "../../../../db/types/calendar-event";
 import { EventHeader } from "./EventHeader";
+import { GoogleMap } from "../../../components/GoogleMap";
 
 interface EventShowProps {
   event: CalendarEvent;
@@ -19,7 +20,13 @@ export const EventShow: React.FC<EventShowProps> = ({ event }) => {
         </>
       )}
 
-      {event.location?.name}
+      {event.location && (
+        <GoogleMap
+          address={event.location.address}
+          locationName={event.location.name}
+          height="400px"
+        />
+      )}
     </Container>
   );
 };

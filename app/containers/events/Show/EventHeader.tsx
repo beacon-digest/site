@@ -12,8 +12,8 @@ interface EventHeaderProps {
 
 export const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
   return (
-    <Stack>
-      <Breadcrumbs>
+    <Stack className="w-full">
+      <Breadcrumbs className="text-xs md:text-base">
         <Link to="/">
           <Anchor>Home</Anchor>
         </Link>
@@ -27,18 +27,20 @@ export const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
           </Anchor>
         </Link>
 
-        <span>{event.name}</span>
+        <span className="truncate max-w-[150px] md:max-w-none">
+          {event.name}
+        </span>
       </Breadcrumbs>
 
-      <Group wrap="nowrap" align="center">
+      <Group wrap="nowrap" align="center" className="w-full">
         <EmojiBox emoji={event.emoji ?? ""} />
 
-        <Stack gap={4} style={{ flex: 1, minWidth: 0 }}>
-          <span className="text-gray-700 text-md">
+        <Stack gap={4} style={{ flex: 1, minWidth: 0, maxWidth: "100%" }}>
+          <span className="text-gray-700 text-sm md:text-md">
             {formatEventTime(event.start_at, event.end_at)}
           </span>
 
-          <h2 className="text-[34px] font-extrabold line-clamp-2 leading-12">
+          <h2 className="text-xl md:text-[34px] font-extrabold line-clamp-2 leading-tight md:leading-12 overflow-hidden text-ellipsis">
             {event.name ?? "Untitled Event"}
           </h2>
         </Stack>

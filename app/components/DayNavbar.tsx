@@ -65,7 +65,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
     const isCurrentDay = formattedDate === selectedDate;
 
     return (
-      <Link key={i} to={path} style={{ textDecoration: "none" }}>
+      <Link key={i} to={path} style={{ textDecoration: "none", width: "100%" }}>
         <Paper
           p="xs"
           onMouseEnter={() => setHoveredDay(formattedDate)}
@@ -80,16 +80,18 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
               : hoveredDay === formattedDate
                 ? "#f8f9fa"
                 : "white",
-            minWidth: rem(100),
+            width: { base: "80px", md: "auto" },
+            maxWidth: { base: "none", md: "120px" },
+            margin: "0 auto",
             cursor: "pointer",
             transition: "background-color 0.2s ease",
           }}
         >
-          <h2 className="text-center text-3xl mb-1 font-extrabold">
+          <h2 className="text-center text-lg md:text-3xl mb-0 md:mb-1 font-extrabold">
             {format(date, "EEE")}
           </h2>
 
-          <span className="text-neutral-500 text-xl">
+          <span className="text-neutral-500 text-sm md:text-xl">
             {format(date, "MMM d")}
           </span>
         </Paper>
@@ -98,16 +100,32 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
   });
 
   return (
-    <Group justify="space-between" className="py-8">
-      <ActionIcon variant="subtle" onClick={handlePreviousWeek} size="lg">
-        <IconChevronLeft />
-      </ActionIcon>
+    <div className="relative py-4 md:py-8 px-1 w-full">
+      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
+        <ActionIcon
+          variant="subtle"
+          onClick={handlePreviousWeek}
+          size={{ base: "md", md: "lg" }}
+          className="flex-shrink-0"
+        >
+          <IconChevronLeft />
+        </ActionIcon>
+      </div>
 
-      {dateLinks}
+      <div className="flex flex-nowrap overflow-x-auto scrollbar-hidden md:grid md:grid-cols-7 md:gap-8 w-full px-2 md:px-8">
+        {dateLinks}
+      </div>
 
-      <ActionIcon variant="subtle" onClick={handleNextWeek} size="lg">
-        <IconChevronRight />
-      </ActionIcon>
-    </Group>
+      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
+        <ActionIcon
+          variant="subtle"
+          onClick={handleNextWeek}
+          size={{ base: "md", md: "lg" }}
+          className="flex-shrink-0"
+        >
+          <IconChevronRight />
+        </ActionIcon>
+      </div>
+    </div>
   );
 };

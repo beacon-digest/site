@@ -31,7 +31,7 @@ export const Home: React.FC<HomeProps> = ({ date, events }) => {
   }, [events, displayedEvents]);
 
   return (
-    <div className="px-12">
+    <div className="px-4 md:px-12">
       <DayNavbar selectedDate={date} />
 
       <div

@@ -10,7 +10,7 @@ export function Layout({ children }: LayoutProps) {
   return (
     <AppShell
       withBorder
-      header={{ height: 80 }}
+      header={{ height: { base: 60, md: 80 } }}
       styles={{
         header: {
           borderBottom: "1px solid var(--color-neutral-300)",
@@ -18,22 +18,23 @@ export function Layout({ children }: LayoutProps) {
         },
         main: {
           fontFamily: "var(--font-libre-franklin)",
+          padding: { base: "0.5rem", md: "1rem" },
         },
       }}
     >
-      <AppShell.Header className="flex items-center justify-between px-12">
+      <AppShell.Header className="flex items-center justify-between px-4 md:px-12">
         <Link to="/">
-          <h1 className="text-2xl font-extrabold font-hepta-slab">
+          <h1 className="text-xl md:text-2xl font-extrabold font-hepta-slab">
             Beacon Digest
           </h1>
         </Link>
 
-        <Group gap="xl">
-          <Link to="/" className="text-sm font-semibold">
+        <Group gap="md" className="md:gap-xl">
+          <Link to="/" className="text-xs md:text-sm font-semibold">
             Events
           </Link>
 
-          <div className="text-sm font-semibold">About</div>
+          <div className="text-xs md:text-sm font-semibold">About</div>
         </Group>
       </AppShell.Header>
       <AppShell.Main>{children}</AppShell.Main>

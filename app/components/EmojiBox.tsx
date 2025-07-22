@@ -20,14 +20,14 @@ export const EmojiBox: React.FC<EmojiBoxProps> = ({ emoji }) => {
 
   return (
     <Box
-      className="w-39 h-39 bg-gray-300 rounded-xl flex items-center justify-center"
+      className="w-20 h-20 md:w-39 md:h-39 bg-gray-300 rounded-lg md:rounded-xl flex items-center justify-center"
       style={{
         background,
         backdropFilter: "blur(8px)",
         WebkitBackdropFilter: "blur(8px)",
       }}
     >
-      <span className="text-6xl">{emoji}</span>
+      <span className="text-3xl md:text-6xl">{emoji}</span>
     </Box>
   );
 };

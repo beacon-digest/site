@@ -7,10 +7,12 @@ export interface CalendarEvent {
   external_id: string | null;
   start_at: Date | null;
   end_at: Date | null;
-  location: {
-    id: number;
-    name: string | null;
-    address: string | null;
-  } | null;
+  location: CalendarEventLocation | null;
   created_at: Date;
+}
+
+export interface CalendarEventLocation {
+  id: number;
+  name: string | null;
+  address: string | null;
 }

@@ -9,7 +9,7 @@ import {
   startOfWeek,
 } from "date-fns";
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface DayNavbarProps {
   selectedDate: string;
@@ -17,6 +17,28 @@ interface DayNavbarProps {
 
 export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
   const navigate = useNavigate();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if we're in mobile view
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Initial check
+    checkMobile();
+
+    // Add event listener for resize
+    window.addEventListener("resize", checkMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Reset date range when view type changes (mobile/desktop)
+  useEffect(() => {
+    setWeekOffset(calculateInitialOffset());
+  }, [isMobile, selectedDate]);
 
   const calculateInitialOffset = () => {
     if (!selectedDate) return 0;
@@ -34,29 +56,49 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
 
   const [weekOffset, setWeekOffset] = useState(calculateInitialOffset);
   const [hoveredDay, setHoveredDay] = useState<string | null>(null);
-  const baseDate = startOfWeek(addDays(new Date(), weekOffset * 7));
-  const daysToDisplay = 7;
+
+  // In desktop view, use weeks. In mobile view, use a reference date with selected date in the middle
+  const baseDate = isMobile
+    ? selectedDate
+      ? addDays(parseISO(selectedDate), -1) // Selected date will be in the middle
+      : startOfWeek(new Date())
+    : startOfWeek(addDays(new Date(), weekOffset * 7));
+
+  const daysToDisplay = isMobile ? 3 : 7;
 
   const handlePreviousWeek = () => {
-    setWeekOffset((prev) => prev - 1);
+    // Calculate the navigation target based on screen size
+    const step = isMobile ? 3 : 7;
 
-    // Navigate to previous week's Saturday (last day of previous week)
-    const previousWeekSaturday = addDays(baseDate, -1);
-    const formattedDate = format(previousWeekSaturday, "yyyy-MM-dd");
+    if (!isMobile) {
+      setWeekOffset((prev) => prev - 1);
+    }
 
+    // For mobile, move 3 days back; for desktop, move to previous week's start
+    const previousDate = isMobile
+      ? addDays(baseDate, -3)
+      : addDays(baseDate, -7);
+
+    const formattedDate = format(previousDate, "yyyy-MM-dd");
     navigate({ to: "/calendar/$date", params: { date: formattedDate } });
   };
 
   const handleNextWeek = () => {
-    setWeekOffset((prev) => prev + 1);
+    // Calculate the navigation target based on screen size
+    const step = isMobile ? 3 : 7;
 
-    // Navigate to next week's Sunday (first day of next week)
-    const nextWeekSunday = addDays(baseDate, 7);
-    const formattedDate = format(nextWeekSunday, "yyyy-MM-dd");
+    if (!isMobile) {
+      setWeekOffset((prev) => prev + 1);
+    }
 
+    // For mobile, move 3 days forward; for desktop, move to next week's start
+    const nextDate = isMobile ? addDays(baseDate, 3) : addDays(baseDate, 7);
+
+    const formattedDate = format(nextDate, "yyyy-MM-dd");
     navigate({ to: "/calendar/$date", params: { date: formattedDate } });
   };
 
+  // Use baseDate directly as we've already calculated it properly above
   const dateLinks = Array.from({ length: daysToDisplay }, (_, i) => {
     const date = addDays(baseDate, i);
     const formattedDate = format(date, "yyyy-MM-dd");
@@ -65,7 +107,11 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
     const isCurrentDay = formattedDate === selectedDate;
 
     return (
-      <Link key={i} to={path} style={{ textDecoration: "none", width: "100%" }}>
+      <Link
+        key={i}
+        to={path}
+        style={{ textDecoration: "none", width: "100%", minWidth: "80px" }}
+      >
         <Paper
           p="xs"
           onMouseEnter={() => setHoveredDay(formattedDate)}
@@ -80,18 +126,21 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
               : hoveredDay === formattedDate
                 ? "#f8f9fa"
                 : "white",
-            width: { base: "80px", md: "auto" },
+            width: { base: "100px", md: "auto" },
             maxWidth: { base: "none", md: "120px" },
             margin: "0 auto",
             cursor: "pointer",
             transition: "background-color 0.2s ease",
+            minHeight: "74px",
+            border: isCurrentDay ? "1px solid #dee2e6" : "none",
+            borderRadius: "8px",
           }}
         >
           <h2 className="text-center text-lg md:text-3xl mb-0 md:mb-1 font-extrabold">
             {format(date, "EEE")}
           </h2>
 
-          <span className="text-neutral-500 text-sm md:text-xl">
+          <span className="text-neutral-500 text-sm md:text-xl text-center w-full">
             {format(date, "MMM d")}
           </span>
         </Paper>
@@ -101,7 +150,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
 
   return (
     <div className="relative py-4 md:py-8 px-1 w-full">
-      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10">
+      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 pl-2">
         <ActionIcon
           variant="subtle"
           onClick={handlePreviousWeek}
@@ -112,11 +161,13 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
         </ActionIcon>
       </div>
 
-      <div className="flex flex-nowrap overflow-x-auto scrollbar-hidden md:grid md:grid-cols-7 md:gap-8 w-full px-2 md:px-8">
+      <div
+        className={`flex flex-nowrap overflow-x-auto scrollbar-hidden justify-center ${isMobile ? "" : "md:grid md:grid-cols-7"} md:gap-8 w-full px-14 md:px-8`}
+      >
         {dateLinks}
       </div>
 
-      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10">
+      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 pr-2">
         <ActionIcon
           variant="subtle"
           onClick={handleNextWeek}

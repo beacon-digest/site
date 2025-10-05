@@ -10,7 +10,7 @@ interface EventProps {
 
 export const Event: React.FC<EventProps> = ({ event }) => {
   return (
-    <Link to="/events/$slug" params={{ slug: event.slug! }}>
+    <Link to="/events/$slug" params={{ slug: `${event.id}-${event.slug}` }}>
       <div className="border-t border-gray-300 py-6 md:py-10">
         <div className="grid grid-cols-[auto_1fr] md:grid-cols-[auto_minmax(180px,1fr)_300px_auto] items-center gap-4 md:gap-10">
           <EmojiBox emoji={event.emoji ?? ""} />

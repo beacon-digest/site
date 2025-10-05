@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { getDatabase } from "../../../db/database";
 
 export const getEvent = createServerFn()
-  .validator((slug: string) => slug)
-  .handler(async ({ data: slug }) => {
+  .validator((id: number) => id)
+  .handler(async ({ data: id }) => {
     const database = getDatabase();
 
     const event = await database
@@ -24,7 +24,7 @@ export const getEvent = createServerFn()
         "locations.name as location_name",
         "locations.address as location_address",
       ])
-      .where("events.slug", "=", slug)
+      .where("events.id", "=", id)
       .executeTakeFirst();
 
     if (!event) throw new Error("Event not found");

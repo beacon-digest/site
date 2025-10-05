@@ -18,7 +18,6 @@ export function Layout({ children }: LayoutProps) {
         },
         main: {
           fontFamily: "var(--font-libre-franklin)",
-          padding: { base: "0.5rem", md: "1rem" },
         },
       }}
     >
@@ -34,7 +33,9 @@ export function Layout({ children }: LayoutProps) {
             Events
           </Link>
 
-          <div className="text-xs md:text-sm font-semibold">About</div>
+          <Link to="/about" className="text-xs md:text-sm font-semibold">
+            About
+          </Link>
         </Group>
       </AppShell.Header>
       <AppShell.Main>{children}</AppShell.Main>

@@ -9,6 +9,7 @@ export interface EventsTable {
   slug: string | null;
   description: string | null;
   external_id: string | null;
+  url: string | null;
   location_id: number | null;
   start_at: Date | null;
   end_at: Date | null;

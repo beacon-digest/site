@@ -23,6 +23,7 @@ interface NotionEvent {
     Description?: { rich_text: { plain_text: string }[] };
     Date?: { date: { start: string; end?: string } };
     Location?: { select: { name: string } | null };
+    Website?: { url: string | null };
     [key: string]: any;
   };
 }
@@ -224,12 +225,16 @@ async function syncNotionEvents(dateString: string) {
             .replace(/^-|-$/g, "")
         : null;
 
+      // Get URL from Website property
+      const url = notionEvent.properties.Website?.url || null;
+
       const eventData = {
         name,
         emoji,
         slug,
         description,
         external_id: externalId,
+        url,
         location_id: locationId,
         start_at: startAt,
         end_at: endAt,

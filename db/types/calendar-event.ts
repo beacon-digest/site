@@ -5,6 +5,7 @@ export interface CalendarEvent {
   slug: string | null;
   description: string | null;
   external_id: string | null;
+  url: string | null;
   start_at: Date | null;
   end_at: Date | null;
   location: CalendarEventLocation | null;

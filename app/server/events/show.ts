@@ -16,6 +16,7 @@ export const getEvent = createServerFn()
         "events.external_id",
         "events.slug",
         "events.description",
+        "events.url",
         "events.start_at",
         "events.end_at",
         "events.created_at",

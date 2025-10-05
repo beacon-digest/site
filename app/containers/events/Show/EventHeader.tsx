@@ -1,4 +1,5 @@
-import { Anchor, Breadcrumbs, Group, Stack } from "@mantine/core";
+import { Anchor, Breadcrumbs, Group, Stack, Button } from "@mantine/core";
+import { IconExternalLink } from "@tabler/icons-react";
 import { CalendarEvent } from "../../../../db/types/calendar-event";
 import { EmojiBox } from "../../../components/EmojiBox";
 import { formatEventTime } from "../../../utils/events";
@@ -40,9 +41,24 @@ export const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
             {formatEventTime(event.start_at, event.end_at)}
           </span>
 
-          <h2 className="text-xl md:text-[34px] font-extrabold line-clamp-2 leading-tight md:leading-12 overflow-hidden text-ellipsis">
+          <h2 className="text-xl md:text-[34px] font-extrabold line-clamp-2 leading-tight md:leading-9 overflow-hidden text-ellipsis">
             {event.name ?? "Untitled Event"}
           </h2>
+
+          {event.url && (
+            <Button
+              component="a"
+              href={event.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              variant="light"
+              size="xs"
+              rightSection={<IconExternalLink size={12} />}
+              className="self-start mt-2"
+            >
+              Website
+            </Button>
+          )}
         </Stack>
       </Group>
     </Stack>

@@ -1,0 +1,24 @@
+{
+  "name": "refresh-events",
+  "version": "1.0.0",
+  "description": "netlify functions:create - scheduled function in TypeScript",
+  "main": "refresh-events.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "netlify",
+    "serverless",
+    "typescript",
+    "schedule"
+  ],
+  "author": "Netlify",
+  "license": "MIT",
+  "dependencies": {
+    "@netlify/functions": "^3.0.4"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "@types/node": "^20.0.0"
+  }
+}

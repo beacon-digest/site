@@ -15,10 +15,22 @@
   "author": "Netlify",
   "license": "MIT",
   "dependencies": {
-    "@netlify/functions": "^3.0.4"
+    "@netlify/functions": "^4.2.7",
+    "@netlify/blobs": "^8.1.0",
+    "@notionhq/client": "3.1.2",
+    "@neondatabase/serverless": "1.0.0",
+    "kysely": "0.28.2",
+    "kysely-neon": "1.3.0",
+    "date-fns": "4.1.0",
+    "date-fns-tz": "3.2.0",
+    "notion-to-md": "^3.1.9",
+    "showdown": "2.1.0",
+    "ws": "8.18.2"
   },
   "devDependencies": {
     "typescript": "^5.8.2",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "@types/showdown": "2.0.6",
+    "@types/ws": "8.18.1"
   }
 }

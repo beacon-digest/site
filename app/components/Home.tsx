@@ -5,6 +5,7 @@ import { Event } from "../components/Event";
 import { CalendarView } from "./CalendarView";
 import { ViewToggle } from "./ViewToggle";
 import { useLocation } from "@tanstack/react-router";
+import { IconCalendarOff } from "@tabler/icons-react";
 
 interface HomeProps {
   date: string;
@@ -84,9 +85,21 @@ export const Home: React.FC<HomeProps> = ({
               transition: "opacity 0.3s ease-in-out",
             }}
           >
-            {displayedEvents.map((event, index) => (
-              <Event key={event.id} event={event} isFirst={index === 0} />
-            ))}
+            {displayedEvents.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 md:py-24">
+                <IconCalendarOff className="w-16 h-16 md:w-20 md:h-20 text-gray-400 mb-4" />
+                <p className="text-lg md:text-xl font-semibold text-gray-700 mb-2">
+                  No events scheduled on this day
+                </p>
+                <p className="text-sm md:text-base text-gray-500">
+                  Check back later
+                </p>
+              </div>
+            ) : (
+              displayedEvents.map((event, index) => (
+                <Event key={event.id} event={event} isFirst={index === 0} />
+              ))
+            )}
           </div>
         )}
       </div>

@@ -39,8 +39,12 @@ export const getEvent = createServerFn()
       ...eventData
     } = event;
 
+    // Ensure dates are treated as UTC by creating new Date objects from ISO strings
+    // This handles cases where naive timestamps might be interpreted as local time
     return {
       ...eventData,
+      start_at: eventData.start_at ? new Date(eventData.start_at.toISOString()) : null,
+      end_at: eventData.end_at ? new Date(eventData.end_at.toISOString()) : null,
       location: location_id
         ? {
             id: location_id_ref!,

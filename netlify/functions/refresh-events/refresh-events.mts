@@ -433,13 +433,12 @@ export default async (req: Request, context: Context) => {
       ],
     });
 
-    const allEventsRaw = response.results as unknown as NotionEvent[];
-    // Filter out hidden events
-    const allEvents = allEventsRaw.filter(
-      (e) => e.properties.Hidden?.checkbox?.equals !== true
-    );
+    const allEvents = response.results as unknown as NotionEvent[];
+    const hiddenCount = allEvents.filter(
+      (e) => e.properties.Hidden?.checkbox?.equals === true
+    ).length;
     console.log(
-      `Found ${allEvents.length} total events in Notion (${allEventsRaw.length - allEvents.length} hidden events filtered out)`
+      `Found ${allEvents.length} total events in Notion (${hiddenCount} hidden events)`
     );
 
     // Filter out already processed events

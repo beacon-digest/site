@@ -41,6 +41,16 @@ function parseNotionDate(dateString: string): Date {
   return fromZonedTime(naiveDate, TIME_ZONE);
 }
 
+function parseDateArg(dateString: string): Date {
+  // Parse date string in YYYY-MM-DD format
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) {
+    throw new Error(`Invalid date format: ${dateString}. Expected YYYY-MM-DD`);
+  }
+  // Set to start of day in the timezone
+  return startOfDay(fromZonedTime(date, TIME_ZONE));
+}
+
 async function parseLocationInfo(locationString: string): Promise<{
   name: string;
   address: string | null;
@@ -235,7 +245,11 @@ async function processEvent(
   }
 }
 
-async function backfillEvents(includeContent: boolean = true) {
+async function backfillEvents(
+  includeContent: boolean = true,
+  fromDate?: Date,
+  toDate?: Date
+) {
   console.log("🚀 Starting event backfill...");
   console.log(`Content conversion: ${includeContent ? "ENABLED" : "DISABLED"}`);
 
@@ -274,10 +288,48 @@ async function backfillEvents(includeContent: boolean = true) {
   });
 
   try {
-    console.log("📅 Querying Notion database for all future events...");
+    // Build date filter based on provided date range
+    const dateFilters: any[] = [];
 
-    // Get all future published events with pagination
-    const now = new Date();
+    if (fromDate && toDate) {
+      console.log(
+        `📅 Querying Notion database for events from ${formatISO(fromDate)} to ${formatISO(toDate)}...`
+      );
+      dateFilters.push({
+        property: "Date",
+        date: { on_or_after: formatISO(fromDate) },
+      });
+      dateFilters.push({
+        property: "Date",
+        date: { on_or_before: formatISO(toDate) },
+      });
+    } else if (fromDate) {
+      console.log(
+        `📅 Querying Notion database for events from ${formatISO(fromDate)} onwards...`
+      );
+      dateFilters.push({
+        property: "Date",
+        date: { on_or_after: formatISO(fromDate) },
+      });
+    } else if (toDate) {
+      console.log(
+        `📅 Querying Notion database for events up to ${formatISO(toDate)}...`
+      );
+      dateFilters.push({
+        property: "Date",
+        date: { on_or_before: formatISO(toDate) },
+      });
+    } else {
+      // Default: future events only
+      const now = new Date();
+      console.log("📅 Querying Notion database for all future events...");
+      dateFilters.push({
+        property: "Date",
+        date: { on_or_after: formatISO(now) },
+      });
+    }
+
+    // Get all published events with pagination
     const allEvents: NotionEvent[] = [];
     let hasMore = true;
     let startCursor: string | undefined = undefined;
@@ -292,7 +344,7 @@ async function backfillEvents(includeContent: boolean = true) {
         filter: {
           and: [
             { property: "Published", checkbox: { equals: true } },
-            { property: "Date", date: { on_or_after: formatISO(now) } },
+            ...dateFilters,
           ],
         },
         sorts: [
@@ -316,8 +368,17 @@ async function backfillEvents(includeContent: boolean = true) {
       );
     }
 
+    const dateRangeDesc =
+      fromDate && toDate
+        ? `events from ${formatISO(fromDate)} to ${formatISO(toDate)}`
+        : fromDate
+          ? `events from ${formatISO(fromDate)}`
+          : toDate
+            ? `events up to ${formatISO(toDate)}`
+            : "future events";
+
     console.log(
-      `📊 Found ${allEvents.length} future events across ${pageCount} pages to process`
+      `📊 Found ${allEvents.length} ${dateRangeDesc} across ${pageCount} pages to process`
     );
 
     if (allEvents.length === 0) {
@@ -407,15 +468,63 @@ Usage: tsx scripts/backfill-events.ts [options]
 
 Options:
   --skip-content, --fast    Skip Notion content conversion (faster but no descriptions)
+  --from-date YYYY-MM-DD   Start date for date range (inclusive)
+  --to-date YYYY-MM-DD     End date for date range (inclusive)
   --help, -h               Show this help message
 
 Examples:
-  tsx scripts/backfill-events.ts                    # Full backfill with content
-  tsx scripts/backfill-events.ts --skip-content     # Fast backfill without descriptions
-  tsx scripts/backfill-events.ts --fast             # Same as --skip-content
+  tsx scripts/backfill-events.ts                                    # Full backfill with content (future events only)
+  tsx scripts/backfill-events.ts --skip-content                     # Fast backfill without descriptions
+  tsx scripts/backfill-events.ts --from-date 2024-01-01            # Events from Jan 1, 2024 onwards
+  tsx scripts/backfill-events.ts --to-date 2023-12-31              # Events up to Dec 31, 2023
+  tsx scripts/backfill-events.ts --from-date 2024-01-01 --to-date 2024-12-31  # Events in 2024
 `);
   process.exit(0);
 }
 
+// Parse date range arguments
+let fromDate: Date | undefined;
+let toDate: Date | undefined;
+
+const fromDateIndex = args.indexOf("--from-date");
+if (fromDateIndex !== -1) {
+  const dateValue = args[fromDateIndex + 1];
+  if (!dateValue || dateValue.startsWith("--")) {
+    console.error("❌ --from-date requires a date value in YYYY-MM-DD format");
+    process.exit(1);
+  }
+  try {
+    fromDate = parseDateArg(dateValue);
+  } catch (error) {
+    console.error(
+      `❌ ${error instanceof Error ? error.message : "Invalid from-date"}`
+    );
+    process.exit(1);
+  }
+}
+
+const toDateIndex = args.indexOf("--to-date");
+if (toDateIndex !== -1) {
+  const dateValue = args[toDateIndex + 1];
+  if (!dateValue || dateValue.startsWith("--")) {
+    console.error("❌ --to-date requires a date value in YYYY-MM-DD format");
+    process.exit(1);
+  }
+  try {
+    toDate = parseDateArg(dateValue);
+  } catch (error) {
+    console.error(
+      `❌ ${error instanceof Error ? error.message : "Invalid to-date"}`
+    );
+    process.exit(1);
+  }
+}
+
+// Validate date range
+if (fromDate && toDate && fromDate > toDate) {
+  console.error("❌ --from-date must be before or equal to --to-date");
+  process.exit(1);
+}
+
 // Run the backfill
-backfillEvents(!skipContent);
+backfillEvents(!skipContent, fromDate, toDate);

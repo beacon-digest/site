@@ -11,7 +11,7 @@ export const getEvents = createServerFn()
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
     if (!dateRegex.test(date)) {
       throw new Error(
-        `Invalid date format: ${date}. Expected YYYY-MM-DD format.`,
+        `Invalid date format: ${date}. Expected YYYY-MM-DD format.`
       );
     }
 
@@ -21,15 +21,15 @@ export const getEvents = createServerFn()
       // Calculate day boundaries in NY timezone
       // Parse the date string as if it's in America/New_York timezone
       // fromZonedTime interprets a Date's components as if they're in the specified timezone and returns UTC
-      const dayStartNY = new Date(date + "T00:00:00");
-      const dayEndNY = new Date(date + "T23:59:59.999");
-      
+      const dayStartNY = new Date(`${date}T00:00:00`);
+      const dayEndNY = new Date(`${date}T23:59:59.999`);
+
       // Convert NY timezone boundaries to UTC Date objects for database comparison
       const dayStart = fromZonedTime(dayStartNY, TIME_ZONE);
       const dayEnd = fromZonedTime(dayEndNY, TIME_ZONE);
 
       // Validate the calculated dates
-      if (isNaN(dayStart.getTime()) || isNaN(dayEnd.getTime())) {
+      if (Number.isNaN(dayStart.getTime()) || Number.isNaN(dayEnd.getTime())) {
         throw new Error(`Failed to calculate day bounds for date: ${date}`);
       }
 
@@ -65,12 +65,8 @@ export const getEvents = createServerFn()
               ...eventData
             } = event;
 
-            // Ensure dates are treated as UTC by creating new Date objects from ISO strings
-            // This handles cases where naive timestamps might be interpreted as local time
-            const normalizedEvent = {
+            return {
               ...eventData,
-              start_at: eventData.start_at ? new Date(eventData.start_at.toISOString()) : null,
-              end_at: eventData.end_at ? new Date(eventData.end_at.toISOString()) : null,
               location: location_id_val
                 ? {
                     id: location_id_val,
@@ -79,9 +75,7 @@ export const getEvents = createServerFn()
                   }
                 : null,
             };
-
-            return normalizedEvent;
-          }),
+          })
         );
     } catch (error) {
       console.error(`Error processing date ${date}:`, error);

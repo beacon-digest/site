@@ -150,7 +150,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
 
   return (
     <div className="relative py-4 md:py-8 px-1 w-full">
-      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 pl-2">
+      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 pl-2 md:pl-4">
         <ActionIcon
           variant="subtle"
           onClick={handlePreviousWeek}
@@ -162,12 +162,12 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
       </div>
 
       <div
-        className={`flex flex-nowrap overflow-x-auto scrollbar-hidden justify-center ${isMobile ? "" : "md:grid md:grid-cols-7"} md:gap-8 w-full px-14 md:px-8`}
+        className={`flex flex-nowrap overflow-x-auto scrollbar-hidden justify-center gap-4 ${isMobile ? "" : "md:grid md:grid-cols-7"} md:gap-8 w-full px-16 md:px-12`}
       >
         {dateLinks}
       </div>
 
-      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 pr-2">
+      <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 pr-2 md:pr-4">
         <ActionIcon
           variant="subtle"
           onClick={handleNextWeek}

@@ -360,11 +360,7 @@ async function backfillEvents(
         start_cursor: startCursor,
       });
 
-      const pageEventsRaw = response.results as unknown as NotionEvent[];
-      // Filter out hidden events
-      const pageEvents = pageEventsRaw.filter(
-        (e) => e.properties.Hidden?.checkbox?.equals !== true
-      );
+      const pageEvents = response.results as unknown as NotionEvent[];
       allEvents.push(...pageEvents);
 
       hasMore = response.has_more;

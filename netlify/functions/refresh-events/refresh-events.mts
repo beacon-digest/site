@@ -272,16 +272,37 @@ async function getAllFuturePublishedEventIds(
     ],
   };
 
-  const response = await notion.databases.query({
-    database_id: databaseId,
-    filter,
-  });
+  // Fetch all events with pagination
+  const allEvents: NotionEvent[] = [];
+  let hasMore = true;
+  let startCursor: string | undefined = undefined;
+  let pageCount = 0;
 
-  const events = response.results as unknown as NotionEvent[];
+  while (hasMore) {
+    pageCount++;
+    const response = await notion.databases.query({
+      database_id: databaseId,
+      filter,
+      page_size: 100,
+      start_cursor: startCursor,
+    });
+
+    const pageEvents = response.results as unknown as NotionEvent[];
+    allEvents.push(...pageEvents);
+
+    hasMore = response.has_more;
+    startCursor = response.next_cursor || undefined;
+  }
+
   // Filter out hidden events in application code
-  const visibleEvents = events.filter(
+  const visibleEvents = allEvents.filter(
     (e) => e.properties.Hidden?.checkbox?.equals !== true
   );
+
+  console.log(
+    `Fetched ${allEvents.length} total events from Notion (${pageCount} pages, ${allEvents.length - visibleEvents.length} hidden events filtered out)`
+  );
+
   return new Set(visibleEvents.map((e) => e.id));
 }
 

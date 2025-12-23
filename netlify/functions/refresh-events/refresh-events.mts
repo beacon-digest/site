@@ -382,6 +382,42 @@ export default async (req: Request, context: Context) => {
         await store.delete("current-progress");
       }
 
+      // Run deletion detection even when no events to process
+      let deletedCount = 0;
+      const timeRemaining = maxExecutionTime - (Date.now() - startTime);
+      const minTimeForDeletion = 2000;
+
+      if (timeRemaining > minTimeForDeletion) {
+        try {
+          const currentNotionIds = new Set(allEvents.map((e) => e.id));
+          const dbNotionEvents = await db
+            .selectFrom("events")
+            .select(["id", "external_id", "name"])
+            .where("external_id", "like", "notion-%")
+            .where("start_at", ">=", new Date())
+            .execute();
+
+          const eventsToDelete = dbNotionEvents.filter((event) => {
+            const notionId = event.external_id?.replace("notion-", "");
+            return notionId && !currentNotionIds.has(notionId);
+          });
+
+          for (const event of eventsToDelete) {
+            await db.deleteFrom("events").where("id", "=", event.id).execute();
+            deletedCount++;
+            console.log(`Deleted event: ${event.name || event.external_id}`);
+          }
+
+          if (deletedCount > 0) {
+            console.log(
+              `Deletion phase completed: ${deletedCount} events deleted`
+            );
+          }
+        } catch (error) {
+          console.error("Error during deletion detection:", error);
+        }
+      }
+
       return new Response(
         JSON.stringify({
           message: "No events to process",
@@ -391,6 +427,7 @@ export default async (req: Request, context: Context) => {
             eventsProcessed: 0,
             eventsCreated: 0,
             eventsUpdated: 0,
+            eventsDeleted: deletedCount,
             totalFound: allEvents.length,
           },
         }),
@@ -487,6 +524,49 @@ export default async (req: Request, context: Context) => {
     // Final checkpoint
     await store.set("current-progress", JSON.stringify(progress));
 
+    // Deletion detection phase
+    let deletedCount = 0;
+    const timeRemaining = maxExecutionTime - (Date.now() - startTime);
+    const minTimeForDeletion = 2000; // 2 seconds minimum
+
+    if (timeRemaining > minTimeForDeletion) {
+      try {
+        // Get all Notion IDs we just processed
+        const currentNotionIds = new Set(allEvents.map((e) => e.id));
+
+        // Query DB for future Notion events
+        const dbNotionEvents = await db
+          .selectFrom("events")
+          .select(["id", "external_id", "name"])
+          .where("external_id", "like", "notion-%")
+          .where("start_at", ">=", new Date())
+          .execute();
+
+        // Find events to delete
+        const eventsToDelete = dbNotionEvents.filter((event) => {
+          const notionId = event.external_id?.replace("notion-", "");
+          return notionId && !currentNotionIds.has(notionId);
+        });
+
+        // Delete orphaned events
+        for (const event of eventsToDelete) {
+          await db.deleteFrom("events").where("id", "=", event.id).execute();
+          deletedCount++;
+          console.log(`Deleted event: ${event.name || event.external_id}`);
+        }
+
+        if (deletedCount > 0) {
+          console.log(
+            `Deletion phase completed: ${deletedCount} events deleted`
+          );
+        }
+      } catch (error) {
+        console.error("Error during deletion detection:", error);
+      }
+    } else {
+      console.log("Skipping deletion detection due to time constraints");
+    }
+
     // Check if job completed successfully
     const isComplete = processedCount === unprocessedEvents.length;
 
@@ -496,7 +576,7 @@ export default async (req: Request, context: Context) => {
       await store.delete("current-progress");
 
       console.log(
-        `Job completed successfully: ${processedCount} events processed (${createdCount} created, ${updatedCount} updated)`
+        `Job completed successfully: ${processedCount} events processed (${createdCount} created, ${updatedCount} updated, ${deletedCount} deleted)`
       );
 
       return new Response(
@@ -508,6 +588,7 @@ export default async (req: Request, context: Context) => {
             eventsProcessed: processedCount,
             eventsCreated: createdCount,
             eventsUpdated: updatedCount,
+            eventsDeleted: deletedCount,
             totalFound: allEvents.length,
             completed: true,
           },
@@ -519,7 +600,7 @@ export default async (req: Request, context: Context) => {
       );
     } else {
       console.log(
-        `Job partially completed: ${processedCount}/${unprocessedEvents.length} events processed, will resume next time`
+        `Job partially completed: ${processedCount}/${unprocessedEvents.length} events processed (${createdCount} created, ${updatedCount} updated, ${deletedCount} deleted), will resume next time`
       );
 
       return new Response(
@@ -531,6 +612,7 @@ export default async (req: Request, context: Context) => {
             eventsProcessed: processedCount,
             eventsCreated: createdCount,
             eventsUpdated: updatedCount,
+            eventsDeleted: deletedCount,
             totalFound: allEvents.length,
             totalRemaining: unprocessedEvents.length - processedCount,
             completed: false,

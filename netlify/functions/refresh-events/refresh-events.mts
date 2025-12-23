@@ -7,7 +7,7 @@ import { NeonDialect } from "kysely-neon";
 import ws from "ws";
 import { Kysely } from "kysely";
 import { NotionToMarkdown } from "notion-to-md";
-import * as Showdown from "showdown";
+import Showdown from "showdown";
 
 interface EventsTable {
   id: number;

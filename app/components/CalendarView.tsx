@@ -103,8 +103,12 @@ export const CalendarView: React.FC<CalendarViewProps> = ({
   };
 
   const handleToday = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
     navigate({
-      to: "/calendar",
+      to: "/calendar/$year/$month",
+      params: { year: String(year), month: String(month) },
     });
   };
 

@@ -39,9 +39,9 @@ export const Home: React.FC<HomeProps> = ({
   }, []);
 
   // Determine view mode based on route path, but force list view on mobile
-  const routeViewMode: ViewMode = location.pathname.startsWith("/calendar")
-    ? "calendar"
-    : "list";
+  // Only /calendar/YYYY/MM routes show calendar view, /calendar/YYYY-MM-DD shows list view
+  const isMonthRoute = /^\/calendar\/\d{4}\/\d{1,2}$/.test(location.pathname);
+  const routeViewMode: ViewMode = isMonthRoute ? "calendar" : "list";
   const viewMode: ViewMode = isMobile ? "list" : routeViewMode;
 
   const [displayedEvents, setDisplayedEvents] =

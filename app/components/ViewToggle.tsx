@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { SegmentedControl, Box } from "@mantine/core";
 import { useNavigate, useLocation } from "@tanstack/react-router";
 import { IconList, IconCalendar } from "@tabler/icons-react";
+import { formatInTimeZone } from "date-fns-tz";
 
 type ViewMode = "list" | "calendar";
 
@@ -32,8 +33,13 @@ export const ViewToggle: React.FC<ViewToggleProps> = ({ currentView }) => {
 
   const handleToggle = (view: string) => {
     if (view === "calendar") {
+      // Navigate to current month calendar view
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth() + 1;
       navigate({
-        to: "/calendar",
+        to: "/calendar/$year/$month",
+        params: { year: String(year), month: String(month) },
       });
     } else {
       navigate({

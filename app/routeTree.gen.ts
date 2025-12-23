@@ -13,8 +13,10 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as CalendarIndexImport } from './routes/calendar/index'
 import { Route as EventsSlugImport } from './routes/events/$slug'
 import { Route as CalendarDateImport } from './routes/calendar/$date'
+import { Route as CalendarYearMonthImport } from './routes/calendar/$year/$month'
 
 // Create/Update Routes
 
@@ -30,6 +32,12 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const CalendarIndexRoute = CalendarIndexImport.update({
+  id: '/calendar/',
+  path: '/calendar/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const EventsSlugRoute = EventsSlugImport.update({
   id: '/events/$slug',
   path: '/events/$slug',
@@ -39,6 +47,12 @@ const EventsSlugRoute = EventsSlugImport.update({
 const CalendarDateRoute = CalendarDateImport.update({
   id: '/calendar/$date',
   path: '/calendar/$date',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const CalendarYearMonthRoute = CalendarYearMonthImport.update({
+  id: '/calendar/$year/$month',
+  path: '/calendar/$year/$month',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -74,6 +88,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsSlugImport
       parentRoute: typeof rootRoute
     }
+    '/calendar/': {
+      id: '/calendar/'
+      path: '/calendar'
+      fullPath: '/calendar'
+      preLoaderRoute: typeof CalendarIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/calendar/$year/$month': {
+      id: '/calendar/$year/$month'
+      path: '/calendar/$year/$month'
+      fullPath: '/calendar/$year/$month'
+      preLoaderRoute: typeof CalendarYearMonthImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -84,6 +112,8 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/calendar': typeof CalendarIndexRoute
+  '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
 export interface FileRoutesByTo {
@@ -91,6 +121,8 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/calendar': typeof CalendarIndexRoute
+  '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
 export interface FileRoutesById {
@@ -99,14 +131,35 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/calendar/': typeof CalendarIndexRoute
+  '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/calendar/$date' | '/events/$slug'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/calendar/$date'
+    | '/events/$slug'
+    | '/calendar'
+    | '/calendar/$year/$month'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/calendar/$date' | '/events/$slug'
-  id: '__root__' | '/' | '/about' | '/calendar/$date' | '/events/$slug'
+  to:
+    | '/'
+    | '/about'
+    | '/calendar/$date'
+    | '/events/$slug'
+    | '/calendar'
+    | '/calendar/$year/$month'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/calendar/$date'
+    | '/events/$slug'
+    | '/calendar/'
+    | '/calendar/$year/$month'
   fileRoutesById: FileRoutesById
 }
 
@@ -115,6 +168,8 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   CalendarDateRoute: typeof CalendarDateRoute
   EventsSlugRoute: typeof EventsSlugRoute
+  CalendarIndexRoute: typeof CalendarIndexRoute
+  CalendarYearMonthRoute: typeof CalendarYearMonthRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -122,6 +177,8 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   CalendarDateRoute: CalendarDateRoute,
   EventsSlugRoute: EventsSlugRoute,
+  CalendarIndexRoute: CalendarIndexRoute,
+  CalendarYearMonthRoute: CalendarYearMonthRoute,
 }
 
 export const routeTree = rootRoute
@@ -137,7 +194,9 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/calendar/$date",
-        "/events/$slug"
+        "/events/$slug",
+        "/calendar/",
+        "/calendar/$year/$month"
       ]
     },
     "/": {
@@ -151,6 +210,12 @@ export const routeTree = rootRoute
     },
     "/events/$slug": {
       "filePath": "events/$slug.tsx"
+    },
+    "/calendar/": {
+      "filePath": "calendar/index.tsx"
+    },
+    "/calendar/$year/$month": {
+      "filePath": "calendar/$year/$month.tsx"
     }
   }
 }

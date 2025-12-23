@@ -1,17 +1,20 @@
 import { EmojiBox } from "./EmojiBox";
 import { IconArrowRight } from "@tabler/icons-react";
-import { CalendarEvent } from "../../db/types/calendar-event";
+import type { CalendarEvent } from "../../db/types/calendar-event";
 import { Link } from "@tanstack/react-router";
 import { formatEventTime } from "../utils/events";
 
 interface EventProps {
   event: CalendarEvent;
+  isFirst?: boolean;
 }
 
-export const Event: React.FC<EventProps> = ({ event }) => {
+export const Event: React.FC<EventProps> = ({ event, isFirst = false }) => {
   return (
     <Link to="/events/$slug" params={{ slug: `${event.id}-${event.slug}` }}>
-      <div className="border-t border-gray-300 py-6 md:py-10">
+      <div
+        className={`${isFirst ? "" : "border-t"} border-gray-300 pb-6 md:pb-10 pt-2`}
+      >
         <div className="grid grid-cols-[auto_1fr] md:grid-cols-[auto_minmax(180px,1fr)_300px_auto] items-center gap-4 md:gap-10">
           <EmojiBox emoji={event.emoji ?? ""} />
 

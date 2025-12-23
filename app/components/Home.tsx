@@ -1,14 +1,49 @@
 import { useState, useEffect } from "react";
-import { CalendarEvent } from "../../db/types/calendar-event";
+import type { CalendarEvent } from "../../db/types/calendar-event";
 import { DayNavbar } from "./DayNavbar";
 import { Event } from "../components/Event";
+import { CalendarView } from "./CalendarView";
+import { ViewToggle } from "./ViewToggle";
+import { useLocation } from "@tanstack/react-router";
 
 interface HomeProps {
   date: string;
   events: CalendarEvent[];
+  monthEvents?: CalendarEvent[];
 }
 
-export const Home: React.FC<HomeProps> = ({ date, events }) => {
+type ViewMode = "list" | "calendar";
+
+export const Home: React.FC<HomeProps> = ({
+  date,
+  events,
+  monthEvents = [],
+}) => {
+  const location = useLocation();
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if we're in mobile view
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Initial check
+    checkMobile();
+
+    // Add event listener for resize
+    window.addEventListener("resize", checkMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Determine view mode based on route path, but force list view on mobile
+  const routeViewMode: ViewMode = location.pathname.startsWith("/calendar")
+    ? "calendar"
+    : "list";
+  const viewMode: ViewMode = isMobile ? "list" : routeViewMode;
+
   const [displayedEvents, setDisplayedEvents] =
     useState<CalendarEvent[]>(events);
   const [fadeOut, setFadeOut] = useState(false);
@@ -32,17 +67,28 @@ export const Home: React.FC<HomeProps> = ({ date, events }) => {
 
   return (
     <div className="px-4 md:px-12">
-      <DayNavbar selectedDate={date} />
+      {viewMode === "list" && <DayNavbar selectedDate={date} />}
 
+      {/* Content area with visual separation from nav */}
       <div
-        style={{
-          opacity: fadeOut ? 0 : 1,
-          transition: "opacity 0.3s ease-in-out",
-        }}
+        className={`${viewMode === "list" ? "border-t border-gray-300" : ""} pt-4 mt-2`}
       >
-        {displayedEvents.map((event) => (
-          <Event key={event.id} event={event} />
-        ))}
+        <ViewToggle currentView={viewMode} />
+
+        {viewMode === "calendar" ? (
+          <CalendarView currentDate={date} events={monthEvents} />
+        ) : (
+          <div
+            style={{
+              opacity: fadeOut ? 0 : 1,
+              transition: "opacity 0.3s ease-in-out",
+            }}
+          >
+            {displayedEvents.map((event, index) => (
+              <Event key={event.id} event={event} isFirst={index === 0} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

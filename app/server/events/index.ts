@@ -1,7 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { getDatabase } from "../../../db/database";
-import { startOfDay, endOfDay } from "date-fns";
-import { toZonedTime } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
 
 export const getEvents = createServerFn()
   .validator((date: string) => date)
@@ -19,16 +18,15 @@ export const getEvents = createServerFn()
     const TIME_ZONE = "America/New_York";
 
     try {
-      // Parse the date string directly in NY timezone to avoid UTC conversion issues
-      const zonedDate = toZonedTime(date, TIME_ZONE);
-
-      // Validate the parsed date
-      if (isNaN(zonedDate.getTime())) {
-        throw new Error(`Invalid date: ${date}`);
-      }
-
-      const dayStart = startOfDay(zonedDate);
-      const dayEnd = endOfDay(zonedDate);
+      // Calculate day boundaries in NY timezone
+      // Parse the date string as if it's in America/New_York timezone
+      // fromZonedTime interprets a Date's components as if they're in the specified timezone and returns UTC
+      const dayStartNY = new Date(date + "T00:00:00");
+      const dayEndNY = new Date(date + "T23:59:59.999");
+      
+      // Convert NY timezone boundaries to UTC Date objects for database comparison
+      const dayStart = fromZonedTime(dayStartNY, TIME_ZONE);
+      const dayEnd = fromZonedTime(dayEndNY, TIME_ZONE);
 
       // Validate the calculated dates
       if (isNaN(dayStart.getTime()) || isNaN(dayEnd.getTime())) {

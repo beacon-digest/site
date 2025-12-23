@@ -20,13 +20,14 @@ export const GoogleMap: React.FC<GoogleMapProps> = ({
   }
 
   // Build query with location name and address for better display
+  // Append city/state/zip for accurate geocoding
   let query = "";
   if (locationName && address) {
-    query = `${locationName}, ${address}`;
+    query = `${locationName}, ${address}, Beacon, NY 12508`;
   } else if (address) {
-    query = address;
+    query = `${address}, Beacon, NY 12508`;
   } else if (locationName) {
-    query = locationName;
+    query = `${locationName}, Beacon, NY 12508`;
   }
 
   const encodedQuery = encodeURIComponent(query);

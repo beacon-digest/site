@@ -269,12 +269,6 @@ async function getAllFuturePublishedEventIds(
     and: [
       { property: "Published", checkbox: { equals: true } },
       { property: "Date", date: { on_or_after: formatISO(now) } },
-      {
-        or: [
-          { property: "Hidden", checkbox: { equals: false } },
-          { property: "Hidden", checkbox: { is_empty: true } },
-        ],
-      },
     ],
   };
 
@@ -284,7 +278,11 @@ async function getAllFuturePublishedEventIds(
   });
 
   const events = response.results as unknown as NotionEvent[];
-  return new Set(events.map((e) => e.id));
+  // Filter out hidden events in application code
+  const visibleEvents = events.filter(
+    (e) => e.properties.Hidden?.checkbox?.equals !== true
+  );
+  return new Set(visibleEvents.map((e) => e.id));
 }
 
 export default async (req: Request, context: Context) => {
@@ -387,12 +385,6 @@ export default async (req: Request, context: Context) => {
             timestamp: "last_edited_time",
             last_edited_time: { on_or_after: lastRunTime },
           },
-          {
-            or: [
-              { property: "Hidden", checkbox: { equals: false } },
-              { property: "Hidden", checkbox: { is_empty: true } },
-            ],
-          },
         ],
       };
     } else {
@@ -402,12 +394,6 @@ export default async (req: Request, context: Context) => {
         and: [
           { property: "Published", checkbox: { equals: true } },
           { property: "Date", date: { on_or_after: formatISO(now) } },
-          {
-            or: [
-              { property: "Hidden", checkbox: { equals: false } },
-              { property: "Hidden", checkbox: { is_empty: true } },
-            ],
-          },
         ],
       };
     }
@@ -426,8 +412,14 @@ export default async (req: Request, context: Context) => {
       ],
     });
 
-    const allEvents = response.results as unknown as NotionEvent[];
-    console.log(`Found ${allEvents.length} total events in Notion`);
+    const allEventsRaw = response.results as unknown as NotionEvent[];
+    // Filter out hidden events
+    const allEvents = allEventsRaw.filter(
+      (e) => e.properties.Hidden?.checkbox?.equals !== true
+    );
+    console.log(
+      `Found ${allEvents.length} total events in Notion (${allEventsRaw.length - allEvents.length} hidden events filtered out)`
+    );
 
     // Filter out already processed events
     const unprocessedEvents = progress

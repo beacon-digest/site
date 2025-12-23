@@ -348,12 +348,6 @@ async function backfillEvents(
           and: [
             { property: "Published", checkbox: { equals: true } },
             ...dateFilters,
-            {
-              or: [
-                { property: "Hidden", checkbox: { equals: false } },
-                { property: "Hidden", checkbox: { is_empty: true } },
-              ],
-            },
           ],
         },
         sorts: [
@@ -366,7 +360,11 @@ async function backfillEvents(
         start_cursor: startCursor,
       });
 
-      const pageEvents = response.results as unknown as NotionEvent[];
+      const pageEventsRaw = response.results as unknown as NotionEvent[];
+      // Filter out hidden events
+      const pageEvents = pageEventsRaw.filter(
+        (e) => e.properties.Hidden?.checkbox?.equals !== true
+      );
       allEvents.push(...pageEvents);
 
       hasMore = response.has_more;

@@ -43,12 +43,14 @@ function parseNotionDate(dateString: string): Date {
 
 function parseDateArg(dateString: string): Date {
   // Parse date string in YYYY-MM-DD format
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) {
+  // Create a date string with time component for proper timezone handling
+  const dateTimeString = `${dateString}T00:00:00`;
+  const naiveDate = new Date(dateTimeString);
+  if (Number.isNaN(naiveDate.getTime())) {
     throw new Error(`Invalid date format: ${dateString}. Expected YYYY-MM-DD`);
   }
-  // Set to start of day in the timezone
-  return startOfDay(fromZonedTime(date, TIME_ZONE));
+  // Interpret the date as if it's in America/New_York timezone and convert to UTC
+  return fromZonedTime(naiveDate, TIME_ZONE);
 }
 
 async function parseLocationInfo(locationString: string): Promise<{
@@ -511,7 +513,14 @@ if (toDateIndex !== -1) {
     process.exit(1);
   }
   try {
-    toDate = parseDateArg(dateValue);
+    // Parse the date string
+    const dateTimeString = `${dateValue}T23:59:59.999`;
+    const naiveDate = new Date(dateTimeString);
+    if (Number.isNaN(naiveDate.getTime())) {
+      throw new Error(`Invalid date format: ${dateValue}. Expected YYYY-MM-DD`);
+    }
+    // Set to end of day in the timezone, then convert to UTC
+    toDate = fromZonedTime(naiveDate, TIME_ZONE);
   } catch (error) {
     console.error(
       `❌ ${error instanceof Error ? error.message : "Invalid to-date"}`

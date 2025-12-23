@@ -50,6 +50,7 @@ interface NotionEvent {
     Date?: { date: { start: string; end?: string } };
     Location?: { select: { name: string } | null };
     Website?: { url: string | null };
+    Hidden?: { checkbox: { equals: boolean } };
     [key: string]: any;
   };
 }
@@ -268,6 +269,12 @@ async function getAllFuturePublishedEventIds(
     and: [
       { property: "Published", checkbox: { equals: true } },
       { property: "Date", date: { on_or_after: formatISO(now) } },
+      {
+        or: [
+          { property: "Hidden", checkbox: { equals: false } },
+          { property: "Hidden", checkbox: { is_empty: true } },
+        ],
+      },
     ],
   };
 
@@ -380,6 +387,12 @@ export default async (req: Request, context: Context) => {
             timestamp: "last_edited_time",
             last_edited_time: { on_or_after: lastRunTime },
           },
+          {
+            or: [
+              { property: "Hidden", checkbox: { equals: false } },
+              { property: "Hidden", checkbox: { is_empty: true } },
+            ],
+          },
         ],
       };
     } else {
@@ -389,6 +402,12 @@ export default async (req: Request, context: Context) => {
         and: [
           { property: "Published", checkbox: { equals: true } },
           { property: "Date", date: { on_or_after: formatISO(now) } },
+          {
+            or: [
+              { property: "Hidden", checkbox: { equals: false } },
+              { property: "Hidden", checkbox: { is_empty: true } },
+            ],
+          },
         ],
       };
     }
@@ -539,12 +558,42 @@ export default async (req: Request, context: Context) => {
       const event = unprocessedEvents[i];
 
       try {
+        // Check if event is hidden
+        const isHidden = event.properties.Hidden?.checkbox?.equals === true;
+
         // Check if event exists before processing
         const existingEvent = await db
           .selectFrom("events")
-          .select("id")
+          .select(["id", "name", "external_id"])
           .where("external_id", "=", `notion-${event.id}`)
           .executeTakeFirst();
+
+        // If event is hidden and exists in DB, delete it
+        if (isHidden && existingEvent) {
+          await db
+            .deleteFrom("events")
+            .where("id", "=", existingEvent.id)
+            .execute();
+          console.log(
+            `Deleted hidden event: ${existingEvent.name || existingEvent.external_id}`
+          );
+          // Add to processed list but don't count as created/updated
+          progress.processedEventIds.push(event.id);
+          progress.currentIndex = i + 1;
+          progress.lastCheckpoint = new Date().toISOString();
+          processedCount++;
+          continue;
+        }
+
+        // Skip processing if hidden (but doesn't exist in DB)
+        if (isHidden) {
+          console.log(`Skipping hidden event: ${event.id}`);
+          progress.processedEventIds.push(event.id);
+          progress.currentIndex = i + 1;
+          progress.lastCheckpoint = new Date().toISOString();
+          processedCount++;
+          continue;
+        }
 
         // Process single event
         await processEvent(

@@ -9,10 +9,6 @@ interface EventLocationProps {
 export const EventLocation = ({ location }: EventLocationProps) => {
   return (
     <div className="my-4 md:my-8">
-      <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6">
-        Location
-      </h2>
-
       <div className="bg-gray-50 rounded-xl p-4 md:p-6 space-y-4 md:space-y-6">
         <div className="grid md:grid-cols-2 gap-4 md:gap-6 items-center">
           <div className="space-y-4">

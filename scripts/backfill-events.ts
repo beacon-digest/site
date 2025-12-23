@@ -25,6 +25,7 @@ interface NotionEvent {
     Date?: { date: { start: string; end?: string } };
     Location?: { select: { name: string } | null };
     Website?: { url: string | null };
+    Hidden?: { checkbox: { equals: boolean } };
     [key: string]: any;
   };
 }
@@ -347,6 +348,12 @@ async function backfillEvents(
           and: [
             { property: "Published", checkbox: { equals: true } },
             ...dateFilters,
+            {
+              or: [
+                { property: "Hidden", checkbox: { equals: false } },
+                { property: "Hidden", checkbox: { is_empty: true } },
+              ],
+            },
           ],
         },
         sorts: [
@@ -391,6 +398,7 @@ async function backfillEvents(
     let processedCount = 0;
     let createdCount = 0;
     let updatedCount = 0;
+    let deletedCount = 0;
     let errorCount = 0;
 
     console.log("\n🔄 Processing events...\n");
@@ -404,21 +412,52 @@ async function backfillEvents(
       console.log(`[${i + 1}/${allEvents.length}] Processing: ${eventName}`);
 
       try {
-        const result = await processEvent(
-          event,
-          db,
-          n2m,
-          converter,
-          includeContent
-        );
+        // Check if event is hidden
+        const isHidden = event.properties.Hidden?.checkbox?.equals === true;
 
-        if (result.created) {
-          createdCount++;
+        // Check if event exists in database
+        const externalId = `notion-${event.id}`;
+        const existingEvent = await db
+          .selectFrom("events")
+          .select(["id", "name", "external_id"])
+          .where("external_id", "=", externalId)
+          .executeTakeFirst();
+
+        // If event is hidden and exists in DB, delete it
+        if (isHidden && existingEvent) {
+          await db
+            .deleteFrom("events")
+            .where("id", "=", existingEvent.id)
+            .execute();
+          console.log(
+            `  🗑️  Deleted hidden event: ${existingEvent.name || existingEvent.external_id}`
+          );
+          deletedCount++;
+          processedCount++;
+          // Continue to next event
+        } else if (isHidden) {
+          // Skip processing if hidden (but doesn't exist in DB)
+          console.log(`  ⏭️  Skipping hidden event: ${event.id}`);
+          processedCount++;
+          // Continue to next event
         } else {
-          updatedCount++;
-        }
+          // Process normal event
+          const result = await processEvent(
+            event,
+            db,
+            n2m,
+            converter,
+            includeContent
+          );
 
-        processedCount++;
+          if (result.created) {
+            createdCount++;
+          } else {
+            updatedCount++;
+          }
+
+          processedCount++;
+        }
       } catch (error) {
         console.error(`  ❌ Error processing event ${event.id}:`, error);
         errorCount++;
@@ -431,7 +470,7 @@ async function backfillEvents(
           `\n📈 Progress: ${i + 1}/${allEvents.length} events processed`
         );
         console.log(
-          `   Created: ${createdCount}, Updated: ${updatedCount}, Errors: ${errorCount}\n`
+          `   Created: ${createdCount}, Updated: ${updatedCount}, Deleted: ${deletedCount}, Errors: ${errorCount}\n`
         );
       }
     }
@@ -442,6 +481,7 @@ async function backfillEvents(
     console.log(`   Successfully processed: ${processedCount}`);
     console.log(`   Created: ${createdCount}`);
     console.log(`   Updated: ${updatedCount}`);
+    console.log(`   Deleted (hidden): ${deletedCount}`);
     console.log(`   Errors: ${errorCount}`);
 
     if (errorCount > 0) {

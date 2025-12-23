@@ -259,6 +259,27 @@ async function processEvent(
   }
 }
 
+async function getAllFuturePublishedEventIds(
+  notion: Client,
+  databaseId: string
+): Promise<Set<string>> {
+  const now = new Date();
+  const filter = {
+    and: [
+      { property: "Published", checkbox: { equals: true } },
+      { property: "Date", date: { on_or_after: formatISO(now) } },
+    ],
+  };
+
+  const response = await notion.databases.query({
+    database_id: databaseId,
+    filter,
+  });
+
+  const events = response.results as unknown as NotionEvent[];
+  return new Set(events.map((e) => e.id));
+}
+
 export default async (req: Request, context: Context) => {
   const startTime = Date.now();
   const maxExecutionTime = 25000; // 25 seconds to leave buffer
@@ -412,7 +433,15 @@ export default async (req: Request, context: Context) => {
 
       if (timeRemaining > minTimeForDeletion) {
         try {
-          const currentNotionIds = new Set(allEvents.map((e) => e.id));
+          // Query all future published events from Notion (not just recently edited ones)
+          const currentNotionIds = await getAllFuturePublishedEventIds(
+            notion,
+            validatedNotionDatabaseId
+          );
+          console.log(
+            `Deletion check: Found ${currentNotionIds.size} future published events in Notion`
+          );
+
           const dbNotionEvents = await db
             .selectFrom("events")
             .select(["id", "external_id", "name"])
@@ -420,18 +449,30 @@ export default async (req: Request, context: Context) => {
             .where("start_at", ">=", new Date())
             .execute();
 
+          console.log(
+            `Deletion check: Found ${dbNotionEvents.length} future Notion events in database`
+          );
+
           const eventsToDelete = dbNotionEvents.filter((event) => {
             const notionId = event.external_id?.replace("notion-", "");
             return notionId && !currentNotionIds.has(notionId);
           });
 
-          for (const event of eventsToDelete) {
-            await db.deleteFrom("events").where("id", "=", event.id).execute();
-            deletedCount++;
-            console.log(`Deleted event: ${event.name || event.external_id}`);
-          }
+          // Safety check: warn if attempting to delete suspiciously many events
+          if (eventsToDelete.length > 10) {
+            console.warn(
+              `WARNING: Attempting to delete ${eventsToDelete.length} events. This seems high. Aborting deletion for safety.`
+            );
+          } else if (eventsToDelete.length > 0) {
+            for (const event of eventsToDelete) {
+              await db
+                .deleteFrom("events")
+                .where("id", "=", event.id)
+                .execute();
+              deletedCount++;
+              console.log(`Deleted event: ${event.name || event.external_id}`);
+            }
 
-          if (deletedCount > 0) {
             console.log(
               `Deletion phase completed: ${deletedCount} events deleted`
             );
@@ -554,8 +595,14 @@ export default async (req: Request, context: Context) => {
 
     if (timeRemaining > minTimeForDeletion) {
       try {
-        // Get all Notion IDs we just processed
-        const currentNotionIds = new Set(allEvents.map((e) => e.id));
+        // Query all future published events from Notion (not just recently edited ones)
+        const currentNotionIds = await getAllFuturePublishedEventIds(
+          notion,
+          validatedNotionDatabaseId
+        );
+        console.log(
+          `Deletion check: Found ${currentNotionIds.size} future published events in Notion`
+        );
 
         // Query DB for future Notion events
         const dbNotionEvents = await db
@@ -565,20 +612,29 @@ export default async (req: Request, context: Context) => {
           .where("start_at", ">=", new Date())
           .execute();
 
+        console.log(
+          `Deletion check: Found ${dbNotionEvents.length} future Notion events in database`
+        );
+
         // Find events to delete
         const eventsToDelete = dbNotionEvents.filter((event) => {
           const notionId = event.external_id?.replace("notion-", "");
           return notionId && !currentNotionIds.has(notionId);
         });
 
-        // Delete orphaned events
-        for (const event of eventsToDelete) {
-          await db.deleteFrom("events").where("id", "=", event.id).execute();
-          deletedCount++;
-          console.log(`Deleted event: ${event.name || event.external_id}`);
-        }
+        // Safety check: warn if attempting to delete suspiciously many events
+        if (eventsToDelete.length > 10) {
+          console.warn(
+            `WARNING: Attempting to delete ${eventsToDelete.length} events. This seems high. Aborting deletion for safety.`
+          );
+        } else if (eventsToDelete.length > 0) {
+          // Delete orphaned events
+          for (const event of eventsToDelete) {
+            await db.deleteFrom("events").where("id", "=", event.id).execute();
+            deletedCount++;
+            console.log(`Deleted event: ${event.name || event.external_id}`);
+          }
 
-        if (deletedCount > 0) {
           console.log(
             `Deletion phase completed: ${deletedCount} events deleted`
           );

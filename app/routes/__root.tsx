@@ -27,6 +27,10 @@ export const Route = createRootRouteWithContext<{
         content: "width=device-width, initial-scale=1",
       },
       {
+        name: "google",
+        content: "notranslate",
+      },
+      {
         title: "Beacon Digest",
       },
     ],

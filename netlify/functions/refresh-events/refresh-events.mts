@@ -273,16 +273,15 @@ export default async (req: Request, context: Context) => {
     const notionDatabaseId = process.env.NOTION_DATABASE_ID;
     const databaseUrl = process.env.VITE_DATABASE_URL;
 
-    if (!notionApiKey) {
-      throw new Error("NOTION_API_KEY environment variable is required");
-    }
+    const missingVars: string[] = [];
+    if (!notionApiKey) missingVars.push("NOTION_API_KEY");
+    if (!notionDatabaseId) missingVars.push("NOTION_DATABASE_ID");
+    if (!databaseUrl) missingVars.push("VITE_DATABASE_URL");
 
-    if (!notionDatabaseId) {
-      throw new Error("NOTION_DATABASE_ID environment variable is required");
-    }
-
-    if (!databaseUrl) {
-      throw new Error("VITE_DATABASE_URL environment variable is required");
+    if (missingVars.length > 0) {
+      throw new Error(
+        `Missing required environment variables: ${missingVars.join(", ")}. Please set these in your Netlify site settings (Site settings → Environment variables).`
+      );
     }
 
     // Initialize clients

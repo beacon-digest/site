@@ -264,33 +264,57 @@ export default async (req: Request, context: Context) => {
   const maxExecutionTime = 25000; // 25 seconds to leave buffer
 
   try {
-    const { next_run }: { next_run: string } = await req.json();
+    const body = (await req.json()) as { next_run?: string };
+    const next_run = body.next_run || "";
 
     console.log("Starting event refresh. Next invocation at:", next_run);
 
     // Check for required environment variables
-    const notionApiKey = process.env.NOTION_API_KEY;
-    const notionDatabaseId = process.env.NOTION_DATABASE_ID;
-    const databaseUrl = process.env.VITE_DATABASE_URL;
+    // Note: Environment variables must be set with "Functions" scope in Netlify
+    const notionApiKey = process.env.NOTION_API_KEY?.trim();
+    const notionDatabaseId = process.env.NOTION_DATABASE_ID?.trim();
+    const databaseUrl = process.env.VITE_DATABASE_URL?.trim();
+
+    // Debug logging (without exposing sensitive values)
+    console.log("Environment variable check:", {
+      hasNotionApiKey: !!notionApiKey,
+      hasNotionDatabaseId: !!notionDatabaseId,
+      hasDatabaseUrl: !!databaseUrl,
+      notionApiKeyLength: notionApiKey?.length || 0,
+      allEnvKeys: Object.keys(process.env).filter(
+        (k) => k.includes("NOTION") || k.includes("DATABASE")
+      ),
+    });
 
     const missingVars: string[] = [];
-    if (!notionApiKey) missingVars.push("NOTION_API_KEY");
-    if (!notionDatabaseId) missingVars.push("NOTION_DATABASE_ID");
-    if (!databaseUrl) missingVars.push("VITE_DATABASE_URL");
-
-    if (missingVars.length > 0) {
-      throw new Error(
-        `Missing required environment variables: ${missingVars.join(", ")}. Please set these in your Netlify site settings (Site settings → Environment variables).`
-      );
+    if (!notionApiKey || notionApiKey.length === 0) {
+      missingVars.push("NOTION_API_KEY");
+    }
+    if (!notionDatabaseId || notionDatabaseId.length === 0) {
+      missingVars.push("NOTION_DATABASE_ID");
+    }
+    if (!databaseUrl || databaseUrl.length === 0) {
+      missingVars.push("VITE_DATABASE_URL");
     }
 
+    if (missingVars.length > 0) {
+      const errorMessage = `Missing required environment variables: ${missingVars.join(", ")}. Please ensure these are set in your Netlify site settings (Site settings → Build & Deploy → Environment variables) with "Functions" scope enabled. After setting, you may need to redeploy the function.`;
+      console.error(errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    // At this point, we know these are non-empty strings
+    const validatedNotionApiKey = notionApiKey as string;
+    const validatedNotionDatabaseId = notionDatabaseId as string;
+    const validatedDatabaseUrl = databaseUrl as string;
+
     // Initialize clients
-    const notion = new Client({ auth: notionApiKey });
+    const notion = new Client({ auth: validatedNotionApiKey });
     const n2m = new NotionToMarkdown({ notionClient: notion });
     const converter = new Showdown.Converter();
 
     const dialect = new NeonDialect({
-      connectionString: databaseUrl,
+      connectionString: validatedDatabaseUrl,
       webSocketConstructor: ws,
     });
     const db = new Kysely<Database>({ dialect });
@@ -352,7 +376,7 @@ export default async (req: Request, context: Context) => {
 
     // Query Notion database
     const response = await notion.databases.query({
-      database_id: notionDatabaseId,
+      database_id: validatedNotionDatabaseId,
       filter,
       sorts: [
         {

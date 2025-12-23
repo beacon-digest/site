@@ -65,7 +65,7 @@ async function parseLocationInfo(locationString: string): Promise<{
 async function findOrCreateLocation(
   db: Kysely<Database>,
   locationName: string,
-  address: string | null,
+  address: string | null
 ): Promise<number> {
   // First, try to find existing location by name
   const existingLocation = await db
@@ -102,7 +102,7 @@ async function findOrCreateLocation(
 async function convertNotionContent(
   n2m: NotionToMarkdown,
   converter: Showdown.Converter,
-  eventId: string,
+  eventId: string
 ): Promise<string | null> {
   try {
     console.log(`  Converting content for event ${eventId}...`);
@@ -135,7 +135,7 @@ async function processEvent(
   db: Kysely<Database>,
   n2m: NotionToMarkdown,
   converter: Showdown.Converter,
-  includeContent: boolean = true,
+  includeContent: boolean = true
 ): Promise<{ created: boolean }> {
   const externalId = `notion-${event.id}`;
 
@@ -156,11 +156,11 @@ async function processEvent(
   const locationData = event.properties.Location?.select;
   if (locationData?.name) {
     const { name: locationName, address } = await parseLocationInfo(
-      locationData.name,
+      locationData.name
     );
     locationId = await findOrCreateLocation(db, locationName, address);
     console.log(
-      `  Location: ${locationName}${address ? ` (${address})` : ""} [ID: ${locationId}]`,
+      `  Location: ${locationName}${address ? ` (${address})` : ""} [ID: ${locationId}]`
     );
   }
 
@@ -221,7 +221,7 @@ async function processEvent(
       .execute();
 
     console.log(
-      `  Updated: ${name || externalId} ${emoji ? `(${emoji})` : ""}`,
+      `  Updated: ${name || externalId} ${emoji ? `(${emoji})` : ""}`
     );
     return { created: false };
   } else {
@@ -229,7 +229,7 @@ async function processEvent(
     await db.insertInto("events").values(eventData).execute();
 
     console.log(
-      `  Created: ${name || externalId} ${emoji ? `(${emoji})` : ""}`,
+      `  Created: ${name || externalId} ${emoji ? `(${emoji})` : ""}`
     );
     return { created: true };
   }
@@ -312,12 +312,12 @@ async function backfillEvents(includeContent: boolean = true) {
       startCursor = response.next_cursor || undefined;
 
       console.log(
-        `  Page ${pageCount}: ${pageEvents.length} events found (total: ${allEvents.length})`,
+        `  Page ${pageCount}: ${pageEvents.length} events found (total: ${allEvents.length})`
       );
     }
 
     console.log(
-      `📊 Found ${allEvents.length} future events across ${pageCount} pages to process`,
+      `📊 Found ${allEvents.length} future events across ${pageCount} pages to process`
     );
 
     if (allEvents.length === 0) {
@@ -346,7 +346,7 @@ async function backfillEvents(includeContent: boolean = true) {
           db,
           n2m,
           converter,
-          includeContent,
+          includeContent
         );
 
         if (result.created) {
@@ -365,10 +365,10 @@ async function backfillEvents(includeContent: boolean = true) {
       // Progress update every 10 events
       if ((i + 1) % 10 === 0 || i === allEvents.length - 1) {
         console.log(
-          `\n📈 Progress: ${i + 1}/${allEvents.length} events processed`,
+          `\n📈 Progress: ${i + 1}/${allEvents.length} events processed`
         );
         console.log(
-          `   Created: ${createdCount}, Updated: ${updatedCount}, Errors: ${errorCount}\n`,
+          `   Created: ${createdCount}, Updated: ${updatedCount}, Errors: ${errorCount}\n`
         );
       }
     }

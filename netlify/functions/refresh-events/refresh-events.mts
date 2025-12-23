@@ -4,10 +4,10 @@ import { Client } from "@notionhq/client";
 import { fromZonedTime } from "date-fns-tz";
 import { addDays, formatISO, startOfDay } from "date-fns";
 import { NeonDialect } from "kysely-neon";
-const ws = require("ws");
+import ws from "ws";
 import { Kysely } from "kysely";
 import { NotionToMarkdown } from "notion-to-md";
-const Showdown = require("showdown");
+import * as Showdown from "showdown";
 
 interface EventsTable {
   id: number;

@@ -50,7 +50,7 @@ interface NotionEvent {
     Date?: { date: { start: string; end?: string } };
     Location?: { select: { name: string } | null };
     Website?: { url: string | null };
-    Hidden?: { checkbox: { equals: boolean } };
+    Hidden?: { type: "checkbox"; checkbox: boolean };
     [key: string]: any;
   };
 }
@@ -296,7 +296,7 @@ async function getAllFuturePublishedEventIds(
 
   // Filter out hidden events in application code
   const visibleEvents = allEvents.filter(
-    (e) => e.properties.Hidden?.checkbox?.equals !== true
+    (e) => e.properties.Hidden?.checkbox !== true
   );
 
   console.log(
@@ -435,7 +435,7 @@ export default async (req: Request, context: Context) => {
 
     const allEvents = response.results as unknown as NotionEvent[];
     const hiddenCount = allEvents.filter(
-      (e) => e.properties.Hidden?.checkbox?.equals === true
+      (e) => e.properties.Hidden?.checkbox === true
     ).length;
     console.log(
       `Found ${allEvents.length} total events in Notion (${hiddenCount} hidden events)`
@@ -571,13 +571,14 @@ export default async (req: Request, context: Context) => {
 
       try {
         // Check if event is hidden
-        const isHidden = event.properties.Hidden?.checkbox?.equals === true;
+        const isHidden = event.properties.Hidden?.checkbox === true;
 
         // Check if event exists before processing
+        const externalId = `notion-${event.id}`;
         const existingEvent = await db
           .selectFrom("events")
           .select(["id", "name", "external_id"])
-          .where("external_id", "=", `notion-${event.id}`)
+          .where("external_id", "=", externalId)
           .executeTakeFirst();
 
         // If event is hidden and exists in DB, delete it
@@ -666,11 +667,12 @@ export default async (req: Request, context: Context) => {
         );
 
         // Query DB for future Notion events
+        const nowForQuery = new Date();
         const dbNotionEvents = await db
           .selectFrom("events")
-          .select(["id", "external_id", "name"])
+          .select(["id", "external_id", "name", "start_at"])
           .where("external_id", "like", "notion-%")
-          .where("start_at", ">=", new Date())
+          .where("start_at", ">=", nowForQuery)
           .execute();
 
         console.log(

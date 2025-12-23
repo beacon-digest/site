@@ -25,7 +25,7 @@ interface NotionEvent {
     Date?: { date: { start: string; end?: string } };
     Location?: { select: { name: string } | null };
     Website?: { url: string | null };
-    Hidden?: { checkbox: { equals: boolean } };
+    Hidden?: { type: "checkbox"; checkbox: boolean };
     [key: string]: any;
   };
 }
@@ -407,7 +407,7 @@ async function backfillEvents(
 
       try {
         // Check if event is hidden
-        const isHidden = event.properties.Hidden?.checkbox?.equals === true;
+        const isHidden = event.properties.Hidden?.checkbox === true;
 
         // Check if event exists in database
         const externalId = `notion-${event.id}`;

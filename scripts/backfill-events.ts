@@ -1,5 +1,5 @@
 import { Client } from "@notionhq/client";
-import { toZonedTime } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
 import { addDays, formatISO, startOfDay } from "date-fns";
 import { NeonDialect } from "kysely-neon";
 import ws from "ws";
@@ -30,6 +30,16 @@ interface NotionEvent {
 }
 
 const TIME_ZONE = "America/New_York";
+
+function parseNotionDate(dateString: string): Date {
+  // If date-only format (YYYY-MM-DD), add time component
+  const dateTimeString = dateString.includes("T")
+    ? dateString
+    : `${dateString}T00:00:00`;
+  const naiveDate = new Date(dateTimeString);
+  // Interpret the date as if it's in America/New_York timezone and convert to UTC
+  return fromZonedTime(naiveDate, TIME_ZONE);
+}
 
 async function parseLocationInfo(locationString: string): Promise<{
   name: string;
@@ -175,8 +185,8 @@ async function processEvent(
   }
 
   const dateData = event.properties.Date?.date;
-  const startAt = dateData?.start ? new Date(dateData.start) : null;
-  const endAt = dateData?.end ? new Date(dateData.end) : null;
+  const startAt = dateData?.start ? parseNotionDate(dateData.start) : null;
+  const endAt = dateData?.end ? parseNotionDate(dateData.end) : null;
 
   // Generate slug from name
   const slug = name

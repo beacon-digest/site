@@ -1,6 +1,6 @@
 import { Client } from "@notionhq/client";
-import { toZonedTime } from "date-fns-tz";
-import { addDays, formatISO, startOfDay } from "date-fns";
+import { fromZonedTime } from "date-fns-tz";
+import { formatISO } from "date-fns";
 import { NeonDialect } from "kysely-neon";
 import ws from "ws";
 import { Kysely } from "kysely";
@@ -124,10 +124,23 @@ async function syncNotionEvents(dateString: string) {
 
   const TIME_ZONE = "America/New_York";
 
+  function parseNotionDate(dateString: string): Date {
+    // If date-only format (YYYY-MM-DD), add time component
+    const dateTimeString = dateString.includes("T")
+      ? dateString
+      : `${dateString}T00:00:00`;
+    const naiveDate = new Date(dateTimeString);
+    // Interpret the date as if it's in America/New_York timezone and convert to UTC
+    return fromZonedTime(naiveDate, TIME_ZONE);
+  }
+
   // Get the start of the target day in the specified timezone
-  const zonedTargetDate = toZonedTime(dateString, TIME_ZONE);
-  const dayStart = startOfDay(zonedTargetDate);
-  const dayEnd = startOfDay(addDays(zonedTargetDate, 1));
+  const dayStartNY = new Date(dateString + "T00:00:00");
+  const dayEndNY = new Date(dateString + "T23:59:59.999");
+  
+  // Convert NY timezone boundaries to UTC Date objects
+  const dayStart = fromZonedTime(dayStartNY, TIME_ZONE);
+  const dayEnd = fromZonedTime(dayEndNY, TIME_ZONE);
 
   try {
     console.log(`Syncing Notion events for date: ${dateString}`);
@@ -213,8 +226,8 @@ async function syncNotionEvents(dateString: string) {
       }
 
       const dateData = notionEvent.properties.Date?.date;
-      const startAt = dateData?.start ? new Date(dateData.start) : null;
-      const endAt = dateData?.end ? new Date(dateData.end) : null;
+      const startAt = dateData?.start ? parseNotionDate(dateData.start) : null;
+      const endAt = dateData?.end ? parseNotionDate(dateData.end) : null;
 
       // Generate slug from name
       const slug = name

@@ -1,7 +1,7 @@
 import type { Config, Context } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
 import { Client } from "@notionhq/client";
-import { toZonedTime } from "date-fns-tz";
+import { fromZonedTime } from "date-fns-tz";
 import { addDays, formatISO, startOfDay } from "date-fns";
 import { NeonDialect } from "kysely-neon";
 const ws = require("ws");
@@ -65,6 +65,16 @@ interface ProcessingProgress {
 
 const TIME_ZONE = "America/New_York";
 
+function parseNotionDate(dateString: string): Date {
+  // If date-only format (YYYY-MM-DD), add time component
+  const dateTimeString = dateString.includes("T")
+    ? dateString
+    : `${dateString}T00:00:00`;
+  const naiveDate = new Date(dateTimeString);
+  // Interpret the date as if it's in America/New_York timezone and convert to UTC
+  return fromZonedTime(naiveDate, TIME_ZONE);
+}
+
 async function parseLocationInfo(locationString: string): Promise<{
   name: string;
   address: string | null;
@@ -89,7 +99,7 @@ async function parseLocationInfo(locationString: string): Promise<{
 async function findOrCreateLocation(
   db: Kysely<Database>,
   locationName: string,
-  address: string | null,
+  address: string | null
 ): Promise<number> {
   // First, try to find existing location by name
   const existingLocation = await db
@@ -127,7 +137,7 @@ async function convertNotionContent(
   notionClient: Client,
   n2m: NotionToMarkdown,
   converter: any,
-  eventId: string,
+  eventId: string
 ): Promise<string | null> {
   try {
     const mdBlocks = await n2m.pageToMarkdown(eventId);
@@ -160,7 +170,7 @@ async function processEvent(
   notion: Client,
   n2m: NotionToMarkdown,
   converter: any,
-  skipContentConversion: boolean = false,
+  skipContentConversion: boolean = false
 ): Promise<void> {
   const externalId = `notion-${event.id}`;
 
@@ -181,7 +191,7 @@ async function processEvent(
   const locationData = event.properties.Location?.select;
   if (locationData?.name) {
     const { name: locationName, address } = await parseLocationInfo(
-      locationData.name,
+      locationData.name
     );
     locationId = await findOrCreateLocation(db, locationName, address);
   }
@@ -201,8 +211,8 @@ async function processEvent(
   }
 
   const dateData = event.properties.Date?.date;
-  const startAt = dateData?.start ? new Date(dateData.start) : null;
-  const endAt = dateData?.end ? new Date(dateData.end) : null;
+  const startAt = dateData?.start ? parseNotionDate(dateData.start) : null;
+  const endAt = dateData?.end ? parseNotionDate(dateData.end) : null;
 
   // Generate slug from name
   const slug = name
@@ -237,14 +247,14 @@ async function processEvent(
       .execute();
 
     console.log(
-      `Updated event: ${name || externalId} ${emoji ? `(${emoji})` : ""}`,
+      `Updated event: ${name || externalId} ${emoji ? `(${emoji})` : ""}`
     );
   } else {
     // Insert new event
     await db.insertInto("events").values(eventData).execute();
 
     console.log(
-      `Created event: ${name || externalId} ${emoji ? `(${emoji})` : ""}`,
+      `Created event: ${name || externalId} ${emoji ? `(${emoji})` : ""}`
     );
   }
 }
@@ -302,14 +312,14 @@ export default async (req: Request, context: Context) => {
       // Resume from existing progress
       lastRunTime = progress.lastRunTime;
       console.log(
-        `Resuming from checkpoint: ${progress.processedEventIds.length}/${progress.totalEventsFound} events processed`,
+        `Resuming from checkpoint: ${progress.processedEventIds.length}/${progress.totalEventsFound} events processed`
       );
     } else {
       // Get last run timestamp from blob storage
       const lastRunBlob = await store.get("last-run-timestamp");
       lastRunTime = lastRunBlob ? lastRunBlob.toString() : null;
       console.log(
-        `Starting fresh run. Last completed run: ${lastRunTime || "Never"}`,
+        `Starting fresh run. Last completed run: ${lastRunTime || "Never"}`
       );
     }
 
@@ -359,7 +369,7 @@ export default async (req: Request, context: Context) => {
     // Filter out already processed events
     const unprocessedEvents = progress
       ? allEvents.filter(
-          (event) => !progress.processedEventIds.includes(event.id),
+          (event) => !progress.processedEventIds.includes(event.id)
         )
       : allEvents;
 
@@ -387,7 +397,7 @@ export default async (req: Request, context: Context) => {
         {
           status: 200,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
 
@@ -411,7 +421,7 @@ export default async (req: Request, context: Context) => {
 
     if (skipContentConversion) {
       console.log(
-        "Skipping content conversion due to large batch size for performance",
+        "Skipping content conversion due to large batch size for performance"
       );
     }
 
@@ -420,7 +430,7 @@ export default async (req: Request, context: Context) => {
       // Check if we're running out of time
       if (Date.now() - startTime > maxExecutionTime) {
         console.log(
-          `Approaching timeout limit, stopping at ${processedCount} events processed`,
+          `Approaching timeout limit, stopping at ${processedCount} events processed`
         );
         break;
       }
@@ -442,7 +452,7 @@ export default async (req: Request, context: Context) => {
           notion,
           n2m,
           converter,
-          skipContentConversion,
+          skipContentConversion
         );
 
         if (existingEvent) {
@@ -464,7 +474,7 @@ export default async (req: Request, context: Context) => {
         ) {
           await store.set("current-progress", JSON.stringify(progress));
           console.log(
-            `Checkpoint: ${processedCount}/${unprocessedEvents.length} events processed`,
+            `Checkpoint: ${processedCount}/${unprocessedEvents.length} events processed`
           );
         }
       } catch (error) {
@@ -486,7 +496,7 @@ export default async (req: Request, context: Context) => {
       await store.delete("current-progress");
 
       console.log(
-        `Job completed successfully: ${processedCount} events processed (${createdCount} created, ${updatedCount} updated)`,
+        `Job completed successfully: ${processedCount} events processed (${createdCount} created, ${updatedCount} updated)`
       );
 
       return new Response(
@@ -505,11 +515,11 @@ export default async (req: Request, context: Context) => {
         {
           status: 200,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     } else {
       console.log(
-        `Job partially completed: ${processedCount}/${unprocessedEvents.length} events processed, will resume next time`,
+        `Job partially completed: ${processedCount}/${unprocessedEvents.length} events processed, will resume next time`
       );
 
       return new Response(
@@ -529,7 +539,7 @@ export default async (req: Request, context: Context) => {
         {
           status: 200,
           headers: { "Content-Type": "application/json" },
-        },
+        }
       );
     }
   } catch (error) {
@@ -543,7 +553,7 @@ export default async (req: Request, context: Context) => {
       {
         status: 500,
         headers: { "Content-Type": "application/json" },
-      },
+      }
     );
   }
 };

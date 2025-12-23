@@ -38,7 +38,7 @@ export function Layout({ children }: LayoutProps) {
           </Link>
         </Group>
       </AppShell.Header>
-      <AppShell.Main>{children}</AppShell.Main>
+      <AppShell.Main id="main-scroll-container">{children}</AppShell.Main>
     </AppShell>
   );
 }

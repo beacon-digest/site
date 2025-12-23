@@ -10,6 +10,7 @@ import type { ReactNode } from "react";
 import mantineCssUrl from "@mantine/core/styles.css?url";
 import appCssUrl from "../styles/app.css?url";
 import { Layout } from "../components/Layout";
+import { ScrollToTop } from "../components/ScrollToTop";
 
 const theme = createTheme({});
 
@@ -55,6 +56,7 @@ function RootComponent() {
   return (
     <RootDocument>
       <MantineProvider theme={theme}>
+        <ScrollToTop />
         <Layout>
           <Outlet />
         </Layout>

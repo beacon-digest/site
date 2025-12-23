@@ -12,7 +12,7 @@ export function createRouter() {
       defaultPreload: "intent",
       context: { queryClient },
     }),
-    queryClient,
+    queryClient
   );
 
   return router;

@@ -67,12 +67,20 @@ interface ProcessingProgress {
 const TIME_ZONE = "America/New_York";
 
 function parseNotionDate(dateString: string): Date {
-  // If date-only format (YYYY-MM-DD), add time component
+  // Check if the date string already has timezone info
+  const hasTimezone = /([+-]\d{2}:\d{2}|Z)$/.test(dateString);
+  
+  if (hasTimezone) {
+    // Date already includes timezone offset, parse directly
+    return new Date(dateString);
+  }
+  
+  // No timezone - either date-only or naive datetime
   const dateTimeString = dateString.includes("T")
     ? dateString
     : `${dateString}T00:00:00`;
   const naiveDate = new Date(dateTimeString);
-  // Interpret the date as if it's in America/New_York timezone and convert to UTC
+  // Interpret as America/New_York and convert to UTC
   return fromZonedTime(naiveDate, TIME_ZONE);
 }
 

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { AppShell, Group } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
+import { IconSearch } from "@tabler/icons-react";
 
 interface LayoutProps {
   children: ReactNode;
@@ -35,6 +36,11 @@ export function Layout({ children }: LayoutProps) {
 
           <Link to="/about" className="text-xs md:text-sm font-semibold">
             About
+          </Link>
+
+          <Link to="/search" className="flex items-center gap-1 text-xs md:text-sm font-semibold">
+            <IconSearch size={16} />
+            <span className="hidden md:inline">Search</span>
           </Link>
         </Group>
       </AppShell.Header>

@@ -33,6 +33,38 @@ export const Route = createRootRouteWithContext<{
       {
         title: "Beacon Digest",
       },
+      {
+        property: "og:title",
+        content: "Beacon Digest",
+      },
+      {
+        property: "og:description",
+        content: "Beacon, NY - Free community calendar",
+      },
+      {
+        property: "og:image",
+        content: "/og-image.png",
+      },
+      {
+        property: "og:type",
+        content: "website",
+      },
+      {
+        name: "twitter:card",
+        content: "summary_large_image",
+      },
+      {
+        name: "twitter:title",
+        content: "Beacon Digest",
+      },
+      {
+        name: "twitter:description",
+        content: "Beacon, NY - Free community calendar",
+      },
+      {
+        name: "twitter:image",
+        content: "/og-image.png",
+      },
     ],
     links: [
       {

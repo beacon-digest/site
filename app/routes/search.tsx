@@ -1,7 +1,20 @@
 import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { MultiSelect, TextInput } from "@mantine/core";
-import { IconSearch, IconCalendarOff } from "@tabler/icons-react";
+import {
+  CheckIcon,
+  CloseButton,
+  Combobox,
+  Group,
+  Input,
+  InputBase,
+  TextInput,
+  useCombobox,
+} from "@mantine/core";
+import {
+  IconSearch,
+  IconCalendarOff,
+  IconChevronDown,
+} from "@tabler/icons-react";
 import { formatInTimeZone } from "date-fns-tz";
 import { searchEvents } from "../server/events/search";
 import { getLocations } from "../server/locations";
@@ -77,6 +90,19 @@ const SearchContainer = () => {
     label: loc.name ?? "Unknown location",
   }));
 
+  const combobox = useCombobox({
+    onDropdownClose: () => combobox.resetSelectedOption(),
+  });
+
+  const selectedLocations = locations.map(String);
+
+  const handleLocationToggle = (val: string) => {
+    const next = selectedLocations.includes(val)
+      ? selectedLocations.filter((v) => v !== val)
+      : [...selectedLocations, val];
+    handleLocationChange(next);
+  };
+
   const grouped = groupEventsByDate(events);
 
   return (
@@ -93,16 +119,66 @@ const SearchContainer = () => {
           />
         </form>
 
-        <MultiSelect
-          label="Location"
-          placeholder="All locations"
-          data={locationOptions}
-          value={locations.map(String)}
-          onChange={handleLocationChange}
-          clearable
-          searchable
-          className="w-full max-w-sm"
-        />
+        <Combobox
+          store={combobox}
+          onOptionSubmit={handleLocationToggle}
+          withinPortal={false}
+        >
+          <Combobox.Target>
+            <Input.Wrapper label="Location" className="w-full max-w-sm">
+              <InputBase
+                component="button"
+                type="button"
+                pointer
+                onClick={() => combobox.toggleDropdown()}
+                rightSection={
+                  selectedLocations.length > 0 ? (
+                    <CloseButton
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLocationChange([]);
+                      }}
+                    />
+                  ) : (
+                    <IconChevronDown size={16} />
+                  )
+                }
+                rightSectionPointerEvents={
+                  selectedLocations.length > 0 ? "all" : "none"
+                }
+              >
+                {selectedLocations.length > 0 ? (
+                  <span>
+                    {selectedLocations.length} location
+                    {selectedLocations.length !== 1 ? "s" : ""} selected
+                  </span>
+                ) : (
+                  <Input.Placeholder>All locations</Input.Placeholder>
+                )}
+              </InputBase>
+            </Input.Wrapper>
+          </Combobox.Target>
+
+          <Combobox.Dropdown>
+            <Combobox.Options>
+              {locationOptions.map((opt) => (
+                <Combobox.Option
+                  key={opt.value}
+                  value={opt.value}
+                  active={selectedLocations.includes(opt.value)}
+                >
+                  <Group gap="sm">
+                    {selectedLocations.includes(opt.value) ? (
+                      <CheckIcon size={12} />
+                    ) : null}
+                    <span>{opt.label}</span>
+                  </Group>
+                </Combobox.Option>
+              ))}
+            </Combobox.Options>
+          </Combobox.Dropdown>
+        </Combobox>
       </div>
 
       <div className="border-t border-gray-300 pt-4">

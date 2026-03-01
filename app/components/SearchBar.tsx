@@ -24,6 +24,8 @@ export function SearchBar() {
     navigate({ to: "/search", search: (prev) => ({ ...prev, q: value }) });
   };
 
+  if (isSearchPage) return null;
+
   return (
     <form onSubmit={handleSubmit} className="hidden md:flex flex-1 max-w-sm">
       <TextInput

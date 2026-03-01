@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { AppShell, Group } from "@mantine/core";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 import { IconSearch } from "@tabler/icons-react";
 import { SearchBar } from "./SearchBar";
 
@@ -9,6 +9,8 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
+  const isSearchPage = useLocation({ select: (l) => l.pathname }) === "/search";
+
   return (
     <AppShell
       withBorder
@@ -42,9 +44,11 @@ export function Layout({ children }: LayoutProps) {
           </Link>
 
           {/* Mobile-only search icon */}
-          <Link to="/search" className="flex items-center md:hidden">
-            <IconSearch size={18} />
-          </Link>
+          {!isSearchPage && (
+            <Link to="/search" className="flex items-center md:hidden">
+              <IconSearch size={18} />
+            </Link>
+          )}
         </Group>
       </AppShell.Header>
       <AppShell.Main id="main-scroll-container">{children}</AppShell.Main>

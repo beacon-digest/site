@@ -81,10 +81,6 @@ const SearchContainer = () => {
 
   return (
     <div className="px-4 md:px-12 py-6">
-      <h1 className="text-2xl md:text-3xl font-extrabold font-hepta-slab mb-6">
-        Find Events
-      </h1>
-
       <div className="flex flex-wrap items-end gap-4 mb-8">
         <form onSubmit={handleQuerySubmit} className="w-full max-w-sm">
           <TextInput

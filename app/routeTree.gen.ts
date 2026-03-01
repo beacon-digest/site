@@ -15,6 +15,7 @@ import { Route as SearchImport } from './routes/search'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
 import { Route as EventsSlugImport } from './routes/events/$slug'
+import { Route as LocationsIdImport } from './routes/locations/$id'
 import { Route as CalendarDateImport } from './routes/calendar/$date'
 import { Route as CalendarYearMonthImport } from './routes/calendar/$year/$month'
 
@@ -41,6 +42,12 @@ const IndexRoute = IndexImport.update({
 const EventsSlugRoute = EventsSlugImport.update({
   id: '/events/$slug',
   path: '/events/$slug',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const LocationsIdRoute = LocationsIdImport.update({
+  id: '/locations/$id',
+  path: '/locations/$id',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -95,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsSlugImport
       parentRoute: typeof rootRoute
     }
+    '/locations/$id': {
+      id: '/locations/$id'
+      path: '/locations/$id'
+      fullPath: '/locations/$id'
+      preLoaderRoute: typeof LocationsIdImport
+      parentRoute: typeof rootRoute
+    }
     '/calendar/$year/$month': {
       id: '/calendar/$year/$month'
       path: '/calendar/$year/$month'
@@ -113,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/locations/$id': typeof LocationsIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
@@ -122,6 +137,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/locations/$id': typeof LocationsIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
@@ -132,6 +148,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/locations/$id': typeof LocationsIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
@@ -143,6 +160,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
+    | '/locations/$id'
     | '/calendar/$year/$month'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -151,6 +169,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
+    | '/locations/$id'
     | '/calendar/$year/$month'
   id:
     | '__root__'
@@ -159,6 +178,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
+    | '/locations/$id'
     | '/calendar/$year/$month'
   fileRoutesById: FileRoutesById
 }
@@ -169,6 +189,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   CalendarDateRoute: typeof CalendarDateRoute
   EventsSlugRoute: typeof EventsSlugRoute
+  LocationsIdRoute: typeof LocationsIdRoute
   CalendarYearMonthRoute: typeof CalendarYearMonthRoute
 }
 
@@ -178,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   CalendarDateRoute: CalendarDateRoute,
   EventsSlugRoute: EventsSlugRoute,
+  LocationsIdRoute: LocationsIdRoute,
   CalendarYearMonthRoute: CalendarYearMonthRoute,
 }
 
@@ -196,6 +218,7 @@ export const routeTree = rootRoute
         "/search",
         "/calendar/$date",
         "/events/$slug",
+        "/locations/$id",
         "/calendar/$year/$month"
       ]
     },
@@ -213,6 +236,9 @@ export const routeTree = rootRoute
     },
     "/events/$slug": {
       "filePath": "events/$slug.tsx"
+    },
+    "/locations/$id": {
+      "filePath": "locations/$id.tsx"
     },
     "/calendar/$year/$month": {
       "filePath": "calendar/$year/$month.tsx"

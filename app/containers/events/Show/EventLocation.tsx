@@ -1,6 +1,7 @@
+import { Link } from "@tanstack/react-router";
 import { CalendarEventLocation } from "../../../../db/types/calendar-event";
 import { GoogleMap } from "../../../components/GoogleMap";
-import { IconMapPin, IconExternalLink } from "@tabler/icons-react";
+import { IconMapPin, IconArrowRight } from "@tabler/icons-react";
 
 interface EventLocationProps {
   location: CalendarEventLocation;
@@ -36,6 +37,15 @@ export const EventLocation = ({ location }: EventLocationProps) => {
               <IconMapPin className="w-3 h-3 md:w-4 md:h-4" />
               Open in Maps
             </a>
+            <Link
+              to="/locations/$id"
+              params={{ id: String(location.id) }}
+              search={{ q: "", page: 1 }}
+              className="flex items-center justify-center gap-2 bg-white text-rose-700 border border-rose-700 px-3 py-1.5 md:px-4 md:py-2 rounded-lg hover:bg-rose-50 transition-colors text-sm md:text-base"
+            >
+              More events here
+              <IconArrowRight className="w-3 h-3 md:w-4 md:h-4" />
+            </Link>
           </div>
         </div>
 

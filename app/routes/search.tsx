@@ -16,13 +16,11 @@ import {
   IconCalendarOff,
   IconChevronDown,
 } from "@tabler/icons-react";
-import { formatInTimeZone } from "date-fns-tz";
 import { searchEvents } from "../server/events/search";
 import { getLocations } from "../server/locations";
 import { Event } from "../components/Event";
-import type { CalendarEvent } from "../../db/types/calendar-event";
+import { groupEventsByDate } from "../utils/groupEventsByDate";
 
-const TIME_ZONE = "America/New_York";
 const PAGE_SIZE = 25;
 
 type SearchParams = {
@@ -44,29 +42,6 @@ const loader = async ({ deps }: { deps: SearchParams }) => {
   ]);
   return { events, total, locationsList };
 };
-
-function groupEventsByDate(events: CalendarEvent[]) {
-  const groups: { date: string; events: CalendarEvent[] }[] = [];
-  let currentDate = "";
-
-  for (const event of events) {
-    const dateKey = event.start_at
-      ? formatInTimeZone(event.start_at, TIME_ZONE, "yyyy-MM-dd")
-      : "unknown";
-    const dateLabel = event.start_at
-      ? formatInTimeZone(event.start_at, TIME_ZONE, "EEEE, MMMM d")
-      : "Date TBD";
-
-    if (dateKey !== currentDate) {
-      currentDate = dateKey;
-      groups.push({ date: dateLabel, events: [event] });
-    } else {
-      groups[groups.length - 1].events.push(event);
-    }
-  }
-
-  return groups;
-}
 
 const SearchContainer = () => {
   const navigate = useNavigate({ from: "/search" });

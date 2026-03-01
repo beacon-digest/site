@@ -6,3 +6,5 @@ cursor-notes
 .output
 .vinxi
 .netlify
+app.config.timestamp_*
+package-lock.json

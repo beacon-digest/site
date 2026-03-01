@@ -1,11 +1,13 @@
+import { useState } from "react";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { MultiSelect } from "@mantine/core";
+import { MultiSelect, TextInput } from "@mantine/core";
+import { IconSearch, IconCalendarOff } from "@tabler/icons-react";
 import { searchEvents } from "../server/events/search";
 import { getLocations } from "../server/locations";
 import { Event } from "../components/Event";
-import { IconCalendarOff } from "@tabler/icons-react";
 
 type SearchParams = {
+  q: string;
   locations: number[];
 };
 
@@ -13,6 +15,7 @@ const loader = async ({ deps }: { deps: SearchParams }) => {
   const [events, locationsList] = await Promise.all([
     searchEvents({
       data: {
+        q: deps.q || undefined,
         locationIds: deps.locations.length ? deps.locations : undefined,
       },
     }),
@@ -23,13 +26,15 @@ const loader = async ({ deps }: { deps: SearchParams }) => {
 
 const SearchContainer = () => {
   const navigate = useNavigate({ from: "/search" });
-  const { locations } = Route.useSearch();
+  const { q, locations } = Route.useSearch();
   const { events, locationsList } = Route.useLoaderData();
 
-  const locationOptions = locationsList.map((loc) => ({
-    value: String(loc.id),
-    label: loc.name ?? "Unknown location",
-  }));
+  const [queryValue, setQueryValue] = useState(q);
+
+  const handleQuerySubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    navigate({ search: (prev) => ({ ...prev, q: queryValue }) });
+  };
 
   const handleLocationChange = (values: string[]) => {
     navigate({
@@ -40,6 +45,11 @@ const SearchContainer = () => {
     });
   };
 
+  const locationOptions = locationsList.map((loc) => ({
+    value: String(loc.id),
+    label: loc.name ?? "Unknown location",
+  }));
+
   return (
     <div className="px-4 md:px-12 py-6">
       <h1 className="text-2xl md:text-3xl font-extrabold font-hepta-slab mb-6">
@@ -47,6 +57,17 @@ const SearchContainer = () => {
       </h1>
 
       <div className="flex flex-wrap gap-4 mb-8">
+        <form onSubmit={handleQuerySubmit} className="w-full max-w-sm">
+          <TextInput
+            value={queryValue}
+            onChange={(e) => setQueryValue(e.currentTarget.value)}
+            placeholder="Search events..."
+            leftSection={<IconSearch size={16} />}
+            radius="xl"
+            autoFocus
+          />
+        </form>
+
         <MultiSelect
           label="Location"
           placeholder="All locations"
@@ -82,15 +103,18 @@ const SearchContainer = () => {
 
 export const Route = createFileRoute("/search")({
   validateSearch: (search: Record<string, unknown>): SearchParams => {
-    const raw = search.locations;
-    const locations = Array.isArray(raw)
-      ? raw.map(Number).filter(Boolean)
-      : raw
-        ? [Number(raw)].filter(Boolean)
+    const rawLocations = search.locations;
+    const locations = Array.isArray(rawLocations)
+      ? rawLocations.map(Number).filter(Boolean)
+      : rawLocations
+        ? [Number(rawLocations)].filter(Boolean)
         : [];
-    return { locations };
+    return {
+      q: typeof search.q === "string" ? search.q : "",
+      locations,
+    };
   },
-  loaderDeps: ({ search: { locations } }) => ({ locations }),
+  loaderDeps: ({ search: { q, locations } }) => ({ q, locations }),
   loader,
   component: SearchContainer,
 });

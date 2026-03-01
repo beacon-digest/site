@@ -2,8 +2,8 @@ import { createServerFn } from "@tanstack/react-start";
 import { getDatabase } from "../../../db/database";
 
 export const searchEvents = createServerFn()
-  .validator((data: { locationIds?: number[] }) => data)
-  .handler(async ({ data: { locationIds } }) => {
+  .validator((data: { q?: string; locationIds?: number[] }) => data)
+  .handler(async ({ data: { q, locationIds } }) => {
     const database = getDatabase();
 
     const now = new Date();
@@ -29,6 +29,10 @@ export const searchEvents = createServerFn()
       ])
       .where("start_at", ">=", now)
       .orderBy("start_at", "asc");
+
+    if (q) {
+      query = query.where("events.name", "ilike", `%${q}%`);
+    }
 
     if (locationIds && locationIds.length > 0) {
       query = query.where("events.location_id", "in", locationIds);

@@ -7,6 +7,7 @@ import {
   Group,
   Input,
   InputBase,
+  Pagination,
   TextInput,
   useCombobox,
 } from "@mantine/core";
@@ -22,23 +23,26 @@ import { Event } from "../components/Event";
 import type { CalendarEvent } from "../../db/types/calendar-event";
 
 const TIME_ZONE = "America/New_York";
+const PAGE_SIZE = 25;
 
 type SearchParams = {
   q: string;
   locations: number[];
+  page: number;
 };
 
 const loader = async ({ deps }: { deps: SearchParams }) => {
-  const [events, locationsList] = await Promise.all([
+  const [{ events, total }, locationsList] = await Promise.all([
     searchEvents({
       data: {
         q: deps.q || undefined,
         locationIds: deps.locations.length ? deps.locations : undefined,
+        page: deps.page - 1,
       },
     }),
     getLocations(),
   ]);
-  return { events, locationsList };
+  return { events, total, locationsList };
 };
 
 function groupEventsByDate(events: CalendarEvent[]) {
@@ -66,14 +70,14 @@ function groupEventsByDate(events: CalendarEvent[]) {
 
 const SearchContainer = () => {
   const navigate = useNavigate({ from: "/search" });
-  const { q, locations } = Route.useSearch();
-  const { events, locationsList } = Route.useLoaderData();
+  const { q, locations, page } = Route.useSearch();
+  const { events, total, locationsList } = Route.useLoaderData();
 
   const [queryValue, setQueryValue] = useState(q);
 
   const handleQuerySubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate({ search: (prev) => ({ ...prev, q: queryValue }) });
+    navigate({ search: (prev) => ({ ...prev, q: queryValue, page: 1 }) });
   };
 
   const handleLocationChange = (values: string[]) => {
@@ -81,8 +85,13 @@ const SearchContainer = () => {
       search: (prev) => ({
         ...prev,
         locations: values.map(Number),
+        page: 1,
       }),
     });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    navigate({ search: (prev) => ({ ...prev, page: newPage }) });
   };
 
   const locationOptions = locationsList.map((loc) => ({
@@ -104,6 +113,7 @@ const SearchContainer = () => {
   };
 
   const grouped = groupEventsByDate(events);
+  const totalPages = Math.ceil(total / PAGE_SIZE);
 
   return (
     <div className="px-4 md:px-12 py-6">
@@ -194,16 +204,27 @@ const SearchContainer = () => {
             </p>
           </div>
         ) : (
-          grouped.map((group) => (
-            <div key={group.date} className="mb-6">
-              <h3 className="text-lg md:text-xl font-bold font-hepta-slab text-gray-800 mb-2">
-                {group.date}
-              </h3>
-              {group.events.map((event, index) => (
-                <Event key={event.id} event={event} isFirst={index === 0} />
-              ))}
-            </div>
-          ))
+          <>
+            {grouped.map((group) => (
+              <div key={group.date} className="mb-6">
+                <h3 className="text-lg md:text-xl font-bold font-hepta-slab text-gray-800 mb-2">
+                  {group.date}
+                </h3>
+                {group.events.map((event, index) => (
+                  <Event key={event.id} event={event} isFirst={index === 0} />
+                ))}
+              </div>
+            ))}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-8">
+                <Pagination
+                  total={totalPages}
+                  value={page}
+                  onChange={handlePageChange}
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
@@ -218,12 +239,16 @@ export const Route = createFileRoute("/search")({
       : rawLocations
         ? [Number(rawLocations)].filter(Boolean)
         : [];
+    const page = typeof search.page === "number" && search.page >= 1
+      ? Math.floor(search.page)
+      : 1;
     return {
       q: typeof search.q === "string" ? search.q : "",
       locations,
+      page,
     };
   },
-  loaderDeps: ({ search: { q, locations } }) => ({ q, locations }),
+  loaderDeps: ({ search: { q, locations, page } }) => ({ q, locations, page }),
   loader,
   component: SearchContainer,
 });

@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as AboutImport } from './routes/about'
 import { Route as SearchImport } from './routes/search'
 import { Route as IndexImport } from './routes/index'
+import { Route as OgImageEventIdImport } from './routes/og-image.$eventId'
 import { Route as EventsSlugImport } from './routes/events/$slug'
 import { Route as CalendarDateImport } from './routes/calendar/$date'
 import { Route as CalendarYearMonthImport } from './routes/calendar/$year/$month'
@@ -35,6 +36,12 @@ const SearchRoute = SearchImport.update({
 const IndexRoute = IndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const OgImageEventIdRoute = OgImageEventIdImport.update({
+  id: '/og-image/$eventId',
+  path: '/og-image/$eventId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -95,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsSlugImport
       parentRoute: typeof rootRoute
     }
+    '/og-image/$eventId': {
+      id: '/og-image/$eventId'
+      path: '/og-image/$eventId'
+      fullPath: '/og-image/$eventId'
+      preLoaderRoute: typeof OgImageEventIdImport
+      parentRoute: typeof rootRoute
+    }
     '/calendar/$year/$month': {
       id: '/calendar/$year/$month'
       path: '/calendar/$year/$month'
@@ -113,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/og-image/$eventId': typeof OgImageEventIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
@@ -122,6 +137,7 @@ export interface FileRoutesByTo {
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/og-image/$eventId': typeof OgImageEventIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
@@ -132,6 +148,7 @@ export interface FileRoutesById {
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
+  '/og-image/$eventId': typeof OgImageEventIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 
@@ -143,6 +160,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
+    | '/og-image/$eventId'
     | '/calendar/$year/$month'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -151,6 +169,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
+    | '/og-image/$eventId'
     | '/calendar/$year/$month'
   id:
     | '__root__'
@@ -159,6 +178,7 @@ export interface FileRouteTypes {
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
+    | '/og-image/$eventId'
     | '/calendar/$year/$month'
   fileRoutesById: FileRoutesById
 }
@@ -169,6 +189,7 @@ export interface RootRouteChildren {
   SearchRoute: typeof SearchRoute
   CalendarDateRoute: typeof CalendarDateRoute
   EventsSlugRoute: typeof EventsSlugRoute
+  OgImageEventIdRoute: typeof OgImageEventIdRoute
   CalendarYearMonthRoute: typeof CalendarYearMonthRoute
 }
 
@@ -178,6 +199,7 @@ const rootRouteChildren: RootRouteChildren = {
   SearchRoute: SearchRoute,
   CalendarDateRoute: CalendarDateRoute,
   EventsSlugRoute: EventsSlugRoute,
+  OgImageEventIdRoute: OgImageEventIdRoute,
   CalendarYearMonthRoute: CalendarYearMonthRoute,
 }
 
@@ -196,6 +218,7 @@ export const routeTree = rootRoute
         "/search",
         "/calendar/$date",
         "/events/$slug",
+        "/og-image/$eventId",
         "/calendar/$year/$month"
       ]
     },
@@ -213,6 +236,9 @@ export const routeTree = rootRoute
     },
     "/events/$slug": {
       "filePath": "events/$slug.tsx"
+    },
+    "/og-image/$eventId": {
+      "filePath": "og-image.$eventId.tsx"
     },
     "/calendar/$year/$month": {
       "filePath": "calendar/$year/$month.tsx"

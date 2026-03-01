@@ -148,11 +148,12 @@ const SearchContainer = () => {
                   selectedLocations.length > 0 ? "all" : "none"
                 }
               >
-                {selectedLocations.length > 0 ? (
+                {selectedLocations.length === 1 ? (
                   <span>
-                    {selectedLocations.length} location
-                    {selectedLocations.length !== 1 ? "s" : ""} selected
+                    {locationOptions.find((o) => o.value === selectedLocations[0])?.label}
                   </span>
+                ) : selectedLocations.length > 1 ? (
+                  <span>{selectedLocations.length} locations selected</span>
                 ) : (
                   <Input.Placeholder>All locations</Input.Placeholder>
                 )}

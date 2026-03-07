@@ -24,9 +24,16 @@ export interface LocationsTable {
   created_at: Generated<Date>;
 }
 
+export interface SubscribersTable {
+  id: Generated<number>;
+  email: string;
+  created_at: Generated<Date>;
+}
+
 export interface Database {
   events: EventsTable;
   locations: LocationsTable;
+  subscribers: SubscribersTable;
 }
 
 let database: Kysely<Database> | undefined;

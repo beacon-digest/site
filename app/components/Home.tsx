@@ -6,7 +6,6 @@ import { CalendarView } from "./CalendarView";
 import { ViewToggle } from "./ViewToggle";
 import { useLocation } from "@tanstack/react-router";
 import { IconCalendarOff } from "@tabler/icons-react";
-import { EmailSignup } from "./EmailSignup";
 
 interface HomeProps {
   date: string;
@@ -105,9 +104,6 @@ export const Home: React.FC<HomeProps> = ({
         )}
       </div>
 
-      <div className="border-t border-gray-300 mt-8">
-        <EmailSignup />
-      </div>
     </div>
   );
 };

@@ -10,11 +10,15 @@ interface EventLocationProps {
 export const EventLocation = ({ location }: EventLocationProps) => {
   return (
     <div className="my-4 md:my-8">
-      <div className="bg-gray-50 rounded-xl p-4 md:p-6 space-y-4 md:space-y-6">
+      <h3 className="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3 md:mb-4">
+        Location
+      </h3>
+
+      <div className="border border-gray-200 rounded-xl p-5 md:p-8 space-y-5 md:space-y-6">
         <div className="grid md:grid-cols-2 gap-4 md:gap-6 items-center">
           <div className="space-y-4">
             <div>
-              <h3 className="text-lg md:text-xl font-medium text-gray-900 mb-1 md:mb-2">
+              <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-1 md:mb-2">
                 {location.name}
               </h3>
               <div className="flex items-start gap-2 text-gray-600">
@@ -27,7 +31,7 @@ export const EventLocation = ({ location }: EventLocationProps) => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-3 md:gap-6 justify-center md:justify-end">
+          <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center md:justify-end">
             <a
               href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${location.name}, ${location.address}, Beacon, NY 12508`)}`}
               target="_blank"

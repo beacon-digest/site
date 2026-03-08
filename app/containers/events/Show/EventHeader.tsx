@@ -1,4 +1,4 @@
-import { Anchor, Breadcrumbs, Group, Stack, Button } from "@mantine/core";
+import { Group, Stack } from "@mantine/core";
 import { IconExternalLink } from "@tabler/icons-react";
 import { CalendarEvent } from "../../../../db/types/calendar-event";
 import { EmojiBox } from "../../../components/EmojiBox";
@@ -14,24 +14,26 @@ interface EventHeaderProps {
 export const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
   return (
     <Stack className="w-full">
-      <Breadcrumbs className="text-xs md:text-base">
-        <Link to="/">
-          <Anchor>Home</Anchor>
+      <nav className="flex items-center gap-1.5 text-xs md:text-sm text-gray-400 mb-4 md:mb-6">
+        <Link
+          to="/"
+          className="hover:text-gray-600 transition-colors duration-150"
+        >
+          Home
         </Link>
-
+        <span className="text-gray-300">/</span>
         <Link
           to="/calendar/$date"
           params={{ date: toISODateString(event.start_at ?? new Date()) }}
+          className="hover:text-gray-600 transition-colors duration-150"
         >
-          <Anchor>
-            {format(event.start_at ?? new Date(), "MMMM d, yyyy")}
-          </Anchor>
+          {format(event.start_at ?? new Date(), "MMMM d, yyyy")}
         </Link>
-
-        <span className="truncate max-w-[150px] md:max-w-none">
+        <span className="text-gray-300">/</span>
+        <span className="text-gray-500 truncate max-w-[150px] md:max-w-none">
           {event.name}
         </span>
-      </Breadcrumbs>
+      </nav>
 
       <Group wrap="nowrap" align="center" className="w-full">
         <EmojiBox emoji={event.emoji ?? ""} />
@@ -41,23 +43,20 @@ export const EventHeader: React.FC<EventHeaderProps> = ({ event }) => {
             {formatEventTime(event.start_at, event.end_at)}
           </span>
 
-          <h2 className="text-xl md:text-[34px] font-extrabold line-clamp-2 leading-tight md:leading-9 overflow-hidden text-ellipsis">
+          <h2 className="text-xl md:text-[34px] font-extrabold line-clamp-2 leading-tight md:leading-11 overflow-hidden text-ellipsis">
             {event.name ?? "Untitled Event"}
           </h2>
 
           {event.url && (
-            <Button
-              component="a"
+            <a
               href={event.url}
               target="_blank"
               rel="noopener noreferrer"
-              variant="light"
-              size="xs"
-              rightSection={<IconExternalLink size={12} />}
-              className="self-start mt-2"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-rose-700 hover:text-rose-800 border border-rose-200 px-3 py-1 rounded-full hover:bg-rose-50 transition-all duration-200 mt-2 self-start"
             >
               Website
-            </Button>
+              <IconExternalLink size={12} />
+            </a>
           )}
         </Stack>
       </Group>

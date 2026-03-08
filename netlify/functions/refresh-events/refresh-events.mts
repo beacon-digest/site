@@ -179,7 +179,6 @@ async function processEvent(
   notion: Client,
   n2m: NotionToMarkdown,
   converter: any,
-  skipContentConversion: boolean = false
 ): Promise<void> {
   const externalId = `notion-${event.id}`;
 
@@ -205,18 +204,15 @@ async function processEvent(
     locationId = await findOrCreateLocation(db, locationName, address);
   }
 
-  // Get page content - skip if requested to save time
-  let description = null;
-  if (!skipContentConversion) {
-    description = await convertNotionContent(notion, n2m, converter, event.id);
+  // Get page content as markdown and convert to HTML
+  let description = await convertNotionContent(notion, n2m, converter, event.id);
 
-    // Fallback to simple text extraction if conversion failed
-    if (!description) {
-      description =
-        event.properties.Description?.rich_text
-          ?.map((item) => item.plain_text)
-          .join("") || null;
-    }
+  // Fallback to simple text extraction if conversion failed
+  if (!description) {
+    description =
+      event.properties.Description?.rich_text
+        ?.map((item) => item.plain_text)
+        .join("") || null;
   }
 
   const dateData = event.properties.Date?.date;
@@ -556,15 +552,6 @@ export default async (req: Request, context: Context) => {
     let processedCount = 0;
     let createdCount = 0;
     let updatedCount = 0;
-    const checkpointInterval = 3; // Checkpoint every 3 events
-    const skipContentConversion = unprocessedEvents.length > 10; // Skip slow content conversion if many events
-
-    if (skipContentConversion) {
-      console.log(
-        "Skipping content conversion due to large batch size for performance"
-      );
-    }
-
     // Process events with time-based checkpointing
     for (let i = 0; i < unprocessedEvents.length; i++) {
       // Check if we're running out of time
@@ -622,8 +609,7 @@ export default async (req: Request, context: Context) => {
           db,
           notion,
           n2m,
-          converter,
-          skipContentConversion
+          converter
         );
 
         if (existingEvent) {
@@ -638,16 +624,12 @@ export default async (req: Request, context: Context) => {
         progress.lastCheckpoint = new Date().toISOString();
         processedCount++;
 
-        // Checkpoint at intervals or after slow operations
-        if (
-          processedCount % checkpointInterval === 0 ||
-          !skipContentConversion
-        ) {
-          await store.set("current-progress", JSON.stringify(progress));
-          console.log(
-            `Checkpoint: ${processedCount}/${unprocessedEvents.length} events processed`
-          );
-        }
+        // Checkpoint after each event (content conversion is slow)
+        await store.set("current-progress", JSON.stringify(progress));
+        console.log(
+          `Checkpoint: ${processedCount}/${unprocessedEvents.length} events processed`
+        );
+
       } catch (error) {
         console.error(`Failed to process event ${event.id}:`, error);
         // Continue with next event rather than failing entire job

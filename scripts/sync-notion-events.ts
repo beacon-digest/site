@@ -165,8 +165,8 @@ async function syncNotionEvents(dateString: string) {
       const notionEvent = page as unknown as NotionEvent;
       const externalId = `notion-${notionEvent.id}`;
 
-      // Check if event already exists
-      const existingEvent = await db
+      // Check if event already exists by external_id
+      let existingEvent = await db
         .selectFrom("events")
         .selectAll()
         .where("external_id", "=", externalId)
@@ -240,6 +240,23 @@ async function syncNotionEvents(dateString: string) {
 
       // Get URL from Website property
       const url = notionEvent.properties.Website?.url || null;
+
+      // If no match by external_id, check for duplicate by name + start_at
+      if (!existingEvent && name && startAt) {
+        const duplicateEvent = await db
+          .selectFrom("events")
+          .selectAll()
+          .where("name", "=", name)
+          .where("start_at", "=", startAt)
+          .executeTakeFirst();
+
+        if (duplicateEvent) {
+          console.log(
+            `Found existing event by name+start_at: "${name}" (ID: ${duplicateEvent.id})`
+          );
+          existingEvent = duplicateEvent;
+        }
+      }
 
       const eventData = {
         name,

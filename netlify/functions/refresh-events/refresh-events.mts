@@ -281,10 +281,10 @@ async function processEvent(
   }
 }
 
-async function getAllFuturePublishedEventIds(
+async function getAllFuturePublishedEvents(
   notion: Client,
   databaseId: string
-): Promise<Set<string>> {
+): Promise<NotionEvent[]> {
   const now = new Date();
   const filter = {
     and: [
@@ -324,7 +324,7 @@ async function getAllFuturePublishedEventIds(
     `Fetched ${allEvents.length} total events from Notion (${pageCount} pages, ${allEvents.length - visibleEvents.length} hidden events filtered out)`
   );
 
-  return new Set(visibleEvents.map((e) => e.id));
+  return visibleEvents;
 }
 
 export default async (req: Request, context: Context) => {
@@ -486,10 +486,11 @@ export default async (req: Request, context: Context) => {
       if (timeRemaining > minTimeForDeletion) {
         try {
           // Query all future published events from Notion (not just recently edited ones)
-          const currentNotionIds = await getAllFuturePublishedEventIds(
+          const currentNotionEvents = await getAllFuturePublishedEvents(
             notion,
             validatedNotionDatabaseId
           );
+          const currentNotionIds = new Set(currentNotionEvents.map((e) => e.id));
           console.log(
             `Deletion check: Found ${currentNotionIds.size} future published events in Notion`
           );
@@ -528,6 +529,26 @@ export default async (req: Request, context: Context) => {
             console.log(
               `Deletion phase completed: ${deletedCount} events deleted`
             );
+          }
+
+          // Gap detection: find Notion events that are missing from the DB
+          const dbExternalIds = new Set(dbNotionEvents.map((e) => e.external_id));
+          const missingEvents = currentNotionEvents.filter(
+            (e) => !dbExternalIds.has(`notion-${e.id}`)
+          );
+
+          if (missingEvents.length > 0) {
+            console.log(
+              `Gap detection: ${missingEvents.length} Notion events missing from DB, syncing...`
+            );
+            for (const event of missingEvents) {
+              if (Date.now() - startTime > maxExecutionTime) break;
+              try {
+                await processEvent(event, db, notion, n2m, converter);
+              } catch (err) {
+                console.error(`Failed to gap-sync event ${event.id}:`, err);
+              }
+            }
           }
         } catch (error) {
           console.error("Error during deletion detection:", error);
@@ -665,10 +686,11 @@ export default async (req: Request, context: Context) => {
     if (timeRemaining > minTimeForDeletion) {
       try {
         // Query all future published events from Notion (not just recently edited ones)
-        const currentNotionIds = await getAllFuturePublishedEventIds(
+        const currentNotionEvents = await getAllFuturePublishedEvents(
           notion,
           validatedNotionDatabaseId
         );
+        const currentNotionIds = new Set(currentNotionEvents.map((e) => e.id));
         console.log(
           `Deletion check: Found ${currentNotionIds.size} future published events in Notion`
         );
@@ -708,6 +730,26 @@ export default async (req: Request, context: Context) => {
           console.log(
             `Deletion phase completed: ${deletedCount} events deleted`
           );
+        }
+
+        // Gap detection: find Notion events that are missing from the DB
+        const dbExternalIds = new Set(dbNotionEvents.map((e) => e.external_id));
+        const missingEvents = currentNotionEvents.filter(
+          (e) => !dbExternalIds.has(`notion-${e.id}`)
+        );
+
+        if (missingEvents.length > 0) {
+          console.log(
+            `Gap detection: ${missingEvents.length} Notion events missing from DB, syncing...`
+          );
+          for (const event of missingEvents) {
+            if (Date.now() - startTime > maxExecutionTime) break;
+            try {
+              await processEvent(event, db, notion, n2m, converter);
+            } catch (err) {
+              console.error(`Failed to gap-sync event ${event.id}:`, err);
+            }
+          }
         }
       } catch (error) {
         console.error("Error during deletion detection:", error);

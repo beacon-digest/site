@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { formatInTimeZone } from "date-fns-tz";
 import { getEvent } from "../../server/events/show";
 import { EventShow } from "../../containers/events/Show";
 
@@ -28,4 +29,16 @@ const EventContainer = () => {
 export const Route = createFileRoute("/events/$slug")({
   component: EventContainer,
   loader,
+  head: ({ loaderData }) => {
+    const event = loaderData?.event;
+    const name = event?.name ?? "Event";
+    const date = event?.start_at
+      ? formatInTimeZone(event.start_at, "America/New_York", "MMMM d, yyyy")
+      : null;
+    const title = date
+      ? `${name} — ${date} | Beacon Digest`
+      : `${name} | Beacon Digest`;
+
+    return { meta: [{ title }] };
+  },
 });

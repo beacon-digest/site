@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Home } from "../../../components/Home";
 import { formatInTimeZone } from "date-fns-tz";
-import { startOfMonth, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
+import { format, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
 import { getEvents, getDateRangeEvents } from "../../../server/events";
 
 const loader = async ({ params }: { params: { year: string; month: string } }) => {
@@ -60,6 +60,16 @@ const MonthContainer = () => {
 export const Route = createFileRoute("/calendar/$year/$month")({
   component: MonthContainer,
   loader,
+  head: ({ params }) => {
+    const year = Number.parseInt(params.year, 10);
+    const month = Number.parseInt(params.month, 10);
+    const title =
+      !isNaN(year) && !isNaN(month) && month >= 1 && month <= 12
+        ? `${format(new Date(year, month - 1, 1), "MMMM yyyy")} | Beacon Digest`
+        : "Beacon Digest";
+
+    return { meta: [{ title }] };
+  },
   beforeLoad: ({ params }) => {
     const year = Number.parseInt(params.year, 10);
     const month = Number.parseInt(params.month, 10);

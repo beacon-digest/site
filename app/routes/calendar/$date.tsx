@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Home } from "../../components/Home";
 import { getEvents, getMonthEvents } from "../../server/events";
 import { formatInTimeZone } from "date-fns-tz";
-import { parseISO } from "date-fns";
+import { format, parseISO } from "date-fns";
 
 const loader = async ({ params }: { params: { date: string } }) => {
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -35,6 +35,14 @@ const DateContainer = () => {
 export const Route = createFileRoute("/calendar/$date")({
   component: DateContainer,
   loader,
+  head: ({ params }) => {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    const title = dateRegex.test(params.date)
+      ? `Events on ${format(parseISO(params.date), "EEEE, MMMM d, yyyy")} | Beacon Digest`
+      : "Beacon Digest";
+
+    return { meta: [{ title }] };
+  },
   beforeLoad: ({ params }) => {
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 

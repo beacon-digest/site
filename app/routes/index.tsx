@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Home } from "../components/Home";
 import { formatInTimeZone } from "date-fns-tz";
 import { getEvents } from "../server/events";
+import { titleMeta } from "../utils/meta";
 
 const loader = async () => {
   const today = formatInTimeZone(new Date(), "America/New_York", "yyyy-MM-dd");
@@ -24,4 +25,7 @@ const IndexContainer = () => {
 export const Route = createFileRoute("/")({
   component: IndexContainer,
   loader,
+  head: () => ({
+    meta: titleMeta("Free Community Calendar in Beacon, NY"),
+  }),
 });

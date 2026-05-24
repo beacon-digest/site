@@ -1,8 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Container, Title, Text, Stack } from "@mantine/core";
+import { titleMeta } from "../utils/meta";
 
 export const Route = createFileRoute("/about")({
   component: AboutComponent,
+  head: () => ({
+    meta: titleMeta("About"),
+  }),
 });
 
 function AboutComponent() {

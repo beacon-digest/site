@@ -3,6 +3,7 @@ import { Home } from "../../../components/Home";
 import { formatInTimeZone } from "date-fns-tz";
 import { format, endOfMonth, startOfWeek, endOfWeek } from "date-fns";
 import { getEvents, getDateRangeEvents } from "../../../server/events";
+import { titleMeta } from "../../../utils/meta";
 
 const loader = async ({ params }: { params: { year: string; month: string } }) => {
   const year = Number.parseInt(params.year, 10);
@@ -63,12 +64,12 @@ export const Route = createFileRoute("/calendar/$year/$month")({
   head: ({ params }) => {
     const year = Number.parseInt(params.year, 10);
     const month = Number.parseInt(params.month, 10);
-    const title =
+    const page =
       !isNaN(year) && !isNaN(month) && month >= 1 && month <= 12
-        ? `${format(new Date(year, month - 1, 1), "MMMM yyyy")} | Beacon Digest`
-        : "Beacon Digest";
+        ? format(new Date(year, month - 1, 1), "MMMM yyyy")
+        : undefined;
 
-    return { meta: [{ title }] };
+    return { meta: titleMeta(page) };
   },
   beforeLoad: ({ params }) => {
     const year = Number.parseInt(params.year, 10);

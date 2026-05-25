@@ -15,6 +15,18 @@ export default defineConfig({
   server: {
     port: 3000,
   },
+  environments: {
+    client: {
+      build: {
+        // Build the client bundle outside `dist/`. Nitro's netlify preset uses
+        // `dist/` as its publicDir and `prepare()` cleans it before
+        // `copyPublicAssets()` runs — if the client output lived at the default
+        // `dist/client`, it would be wiped before being copied, leaving the
+        // deploy with no JS/CSS. Building to a sibling dir avoids that collision.
+        outDir: ".tanstack-client",
+      },
+    },
+  },
   plugins: [
     tsConfigPaths({
       projects: ["./tsconfig.json"],

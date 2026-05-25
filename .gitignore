@@ -8,6 +8,7 @@ dist
 .vinxi
 .nitro
 .tanstack
+.tanstack-client
 .netlify
 app.config.timestamp_*
 package-lock.json

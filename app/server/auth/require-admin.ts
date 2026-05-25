@@ -58,7 +58,10 @@ export async function resolveAdminAuth(): Promise<AdminAuth | null> {
     },
     organizationId: auth.organizationId ?? null,
     role: auth.role ?? null,
-    permissions: auth.permissions ?? null,
+    // null = RBAC not configured (any staff member passes hasPermission).
+    // Treat an empty array the same way: WorkOS returns [] when roles are
+    // defined in the dashboard but no permissions have been assigned yet.
+    permissions: auth.permissions?.length ? auth.permissions : null,
   };
 }
 

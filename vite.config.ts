@@ -23,7 +23,12 @@ export default defineConfig({
     tanstackStart({
       srcDirectory: "app",
     }),
-    nitroV2Plugin({ compatibilityDate: "2026-05-25" }),
+    nitroV2Plugin({
+      compatibilityDate: "2026-05-25",
+      // Auto-select the Netlify preset when building on Netlify CI.
+      // Locally omit it so Nitro uses the node-server preset (runs .output/server/index.mjs).
+      preset: process.env.NETLIFY ? "netlify" : undefined,
+    }),
     viteReact(),
   ],
 });

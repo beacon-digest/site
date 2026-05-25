@@ -1,2 +1,9 @@
+[build]
+  # Nitro preset is configured in vite.config.ts via the NETLIFY env var.
+  # The Netlify UI passes --preset netlify which vite doesn't understand, so
+  # we override the command here.
+  command = "pnpm run build"
+  publish = ".output/public"
+
 [build.environment]
   TZ = "America/New_York"

@@ -41,13 +41,6 @@
     "tsx": "4.19.4",
     "ws": "8.18.2"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@biomejs/biome",
-      "@parcel/watcher",
-      "esbuild"
-    ]
-  },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@tailwindcss/postcss": "4.3.0",

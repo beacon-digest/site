@@ -271,16 +271,23 @@ async function syncNotionEvents(dateString: string) {
       };
 
       if (existingEvent) {
-        // Update existing event
-        await db
-          .updateTable("events")
-          .set(eventData)
-          .where("id", "=", existingEvent.id)
-          .execute();
+        if (existingEvent.admin_locked) {
+          // Admin is the source of truth for events edited in the admin panel.
+          console.log(
+            `Skipping admin-locked event: ${name || externalId}`,
+          );
+        } else {
+          // Update existing event
+          await db
+            .updateTable("events")
+            .set(eventData)
+            .where("id", "=", existingEvent.id)
+            .execute();
 
-        console.log(
-          `Updated event: ${name || externalId} ${emoji ? `(${emoji})` : ""} ${locationId ? `at location ID ${locationId}` : ""}`,
-        );
+          console.log(
+            `Updated event: ${name || externalId} ${emoji ? `(${emoji})` : ""} ${locationId ? `at location ID ${locationId}` : ""}`,
+          );
+        }
       } else {
         // Insert new event
         await db.insertInto("events").values(eventData).execute();

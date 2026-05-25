@@ -1,2 +1,11 @@
+[build]
+  # Nitro preset is configured in vite.config.ts via the NETLIFY env var.
+  # The Netlify UI passes --preset netlify which vite doesn't understand, so
+  # we override the command here.
+  command = "pnpm run build"
+  # The Nitro netlify preset writes static assets to dist/ and the SSR function
+  # to .netlify/functions-internal/ (auto-detected by Netlify).
+  publish = "dist"
+
 [build.environment]
   TZ = "America/New_York"

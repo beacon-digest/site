@@ -21,6 +21,9 @@ interface EventsTable {
   start_at: Date | null;
   end_at: Date | null;
   created_at: Date;
+  organization_id: string | null;
+  status: string;
+  admin_locked: boolean;
 }
 
 interface LocationsTable {
@@ -261,6 +264,11 @@ async function processEvent(
   };
 
   if (existingEvent) {
+    if (existingEvent.admin_locked) {
+      // Admin is the source of truth for events edited in the admin panel.
+      console.log(`Skipping admin-locked event: ${name || externalId}`);
+      return;
+    }
     // Update existing event
     await db
       .updateTable("events")
@@ -499,6 +507,7 @@ export default async (req: Request, context: Context) => {
             .selectFrom("events")
             .select(["id", "external_id", "name"])
             .where("external_id", "like", "notion-%")
+            .where("admin_locked", "=", false)
             .where("start_at", ">=", new Date())
             .execute();
 
@@ -610,12 +619,13 @@ export default async (req: Request, context: Context) => {
         const externalId = `notion-${event.id}`;
         const existingEvent = await db
           .selectFrom("events")
-          .select(["id", "name", "external_id"])
+          .select(["id", "name", "external_id", "admin_locked"])
           .where("external_id", "=", externalId)
           .executeTakeFirst();
 
-        // If event is hidden and exists in DB, delete it
-        if (isHidden && existingEvent) {
+        // If event is hidden and exists in DB, delete it — unless an admin has
+        // taken ownership of it in the admin panel.
+        if (isHidden && existingEvent && !existingEvent.admin_locked) {
           await db
             .deleteFrom("events")
             .where("id", "=", existingEvent.id)
@@ -701,6 +711,7 @@ export default async (req: Request, context: Context) => {
           .selectFrom("events")
           .select(["id", "external_id", "name", "start_at"])
           .where("external_id", "like", "notion-%")
+          .where("admin_locked", "=", false)
           .where("start_at", ">=", nowForQuery)
           .execute();
 

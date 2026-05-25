@@ -8,129 +8,102 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as LocationsIdRouteImport } from './routes/locations/$id'
+import { Route as EventsSlugRouteImport } from './routes/events/$slug'
+import { Route as CalendarDateRouteImport } from './routes/calendar/$date'
+import { Route as CalendarYearMonthRouteImport } from './routes/calendar/$year/$month'
+import { Route as ApiAuthSignInRouteImport } from './routes/api/auth/sign-in'
+import { Route as ApiAuthCallbackRouteImport } from './routes/api/auth/callback'
+import { Route as AdminEventsNewRouteImport } from './routes/admin/events/new'
+import { Route as AdminEventsIdRouteImport } from './routes/admin/events/$id'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as SearchImport } from './routes/search'
-import { Route as AboutImport } from './routes/about'
-import { Route as IndexImport } from './routes/index'
-import { Route as EventsSlugImport } from './routes/events/$slug'
-import { Route as LocationsIdImport } from './routes/locations/$id'
-import { Route as CalendarDateImport } from './routes/calendar/$date'
-import { Route as CalendarYearMonthImport } from './routes/calendar/$year/$month'
-
-// Create/Update Routes
-
-const SearchRoute = SearchImport.update({
+const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AboutRoute = AboutImport.update({
+const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const EventsSlugRoute = EventsSlugImport.update({
-  id: '/events/$slug',
-  path: '/events/$slug',
-  getParentRoute: () => rootRoute,
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-
-const LocationsIdRoute = LocationsIdImport.update({
+const LocationsIdRoute = LocationsIdRouteImport.update({
   id: '/locations/$id',
   path: '/locations/$id',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CalendarDateRoute = CalendarDateImport.update({
+const EventsSlugRoute = EventsSlugRouteImport.update({
+  id: '/events/$slug',
+  path: '/events/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarDateRoute = CalendarDateRouteImport.update({
   id: '/calendar/$date',
   path: '/calendar/$date',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CalendarYearMonthRoute = CalendarYearMonthImport.update({
+const CalendarYearMonthRoute = CalendarYearMonthRouteImport.update({
   id: '/calendar/$year/$month',
   path: '/calendar/$year/$month',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
-      parentRoute: typeof rootRoute
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchImport
-      parentRoute: typeof rootRoute
-    }
-    '/calendar/$date': {
-      id: '/calendar/$date'
-      path: '/calendar/$date'
-      fullPath: '/calendar/$date'
-      preLoaderRoute: typeof CalendarDateImport
-      parentRoute: typeof rootRoute
-    }
-    '/events/$slug': {
-      id: '/events/$slug'
-      path: '/events/$slug'
-      fullPath: '/events/$slug'
-      preLoaderRoute: typeof EventsSlugImport
-      parentRoute: typeof rootRoute
-    }
-    '/locations/$id': {
-      id: '/locations/$id'
-      path: '/locations/$id'
-      fullPath: '/locations/$id'
-      preLoaderRoute: typeof LocationsIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/calendar/$year/$month': {
-      id: '/calendar/$year/$month'
-      path: '/calendar/$year/$month'
-      fullPath: '/calendar/$year/$month'
-      preLoaderRoute: typeof CalendarYearMonthImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
+const ApiAuthSignInRoute = ApiAuthSignInRouteImport.update({
+  id: '/api/auth/sign-in',
+  path: '/api/auth/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthCallbackRoute = ApiAuthCallbackRouteImport.update({
+  id: '/api/auth/callback',
+  path: '/api/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEventsNewRoute = AdminEventsNewRouteImport.update({
+  id: '/events/new',
+  path: '/events/new',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminEventsIdRoute = AdminEventsIdRouteImport.update({
+  id: '/events/$id',
+  path: '/events/$id',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/events/new': typeof AdminEventsNewRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
@@ -138,29 +111,44 @@ export interface FileRoutesByTo {
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/events/new': typeof AdminEventsNewRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/events/new': typeof AdminEventsNewRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/about'
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
     | '/locations/$id'
+    | '/admin/'
+    | '/admin/events/$id'
+    | '/admin/events/new'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
     | '/calendar/$year/$month'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -170,79 +158,176 @@ export interface FileRouteTypes {
     | '/calendar/$date'
     | '/events/$slug'
     | '/locations/$id'
+    | '/admin'
+    | '/admin/events/$id'
+    | '/admin/events/new'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
     | '/calendar/$year/$month'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/about'
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
     | '/locations/$id'
+    | '/admin/'
+    | '/admin/events/$id'
+    | '/admin/events/new'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
     | '/calendar/$year/$month'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   SearchRoute: typeof SearchRoute
   CalendarDateRoute: typeof CalendarDateRoute
   EventsSlugRoute: typeof EventsSlugRoute
   LocationsIdRoute: typeof LocationsIdRoute
+  ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
+  ApiAuthSignInRoute: typeof ApiAuthSignInRoute
   CalendarYearMonthRoute: typeof CalendarYearMonthRoute
 }
 
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/locations/$id': {
+      id: '/locations/$id'
+      path: '/locations/$id'
+      fullPath: '/locations/$id'
+      preLoaderRoute: typeof LocationsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$slug': {
+      id: '/events/$slug'
+      path: '/events/$slug'
+      fullPath: '/events/$slug'
+      preLoaderRoute: typeof EventsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendar/$date': {
+      id: '/calendar/$date'
+      path: '/calendar/$date'
+      fullPath: '/calendar/$date'
+      preLoaderRoute: typeof CalendarDateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendar/$year/$month': {
+      id: '/calendar/$year/$month'
+      path: '/calendar/$year/$month'
+      fullPath: '/calendar/$year/$month'
+      preLoaderRoute: typeof CalendarYearMonthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/sign-in': {
+      id: '/api/auth/sign-in'
+      path: '/api/auth/sign-in'
+      fullPath: '/api/auth/sign-in'
+      preLoaderRoute: typeof ApiAuthSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/callback': {
+      id: '/api/auth/callback'
+      path: '/api/auth/callback'
+      fullPath: '/api/auth/callback'
+      preLoaderRoute: typeof ApiAuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/events/new': {
+      id: '/admin/events/new'
+      path: '/events/new'
+      fullPath: '/admin/events/new'
+      preLoaderRoute: typeof AdminEventsNewRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/events/$id': {
+      id: '/admin/events/$id'
+      path: '/events/$id'
+      fullPath: '/admin/events/$id'
+      preLoaderRoute: typeof AdminEventsIdRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+  }
+}
+
+interface AdminRouteRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminEventsIdRoute: typeof AdminEventsIdRoute
+  AdminEventsNewRoute: typeof AdminEventsNewRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+  AdminEventsIdRoute: AdminEventsIdRoute,
+  AdminEventsNewRoute: AdminEventsNewRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   SearchRoute: SearchRoute,
   CalendarDateRoute: CalendarDateRoute,
   EventsSlugRoute: EventsSlugRoute,
   LocationsIdRoute: LocationsIdRoute,
+  ApiAuthCallbackRoute: ApiAuthCallbackRoute,
+  ApiAuthSignInRoute: ApiAuthSignInRoute,
   CalendarYearMonthRoute: CalendarYearMonthRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/about",
-        "/search",
-        "/calendar/$date",
-        "/events/$slug",
-        "/locations/$id",
-        "/calendar/$year/$month"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/about": {
-      "filePath": "about.tsx"
-    },
-    "/search": {
-      "filePath": "search.tsx"
-    },
-    "/calendar/$date": {
-      "filePath": "calendar/$date.tsx"
-    },
-    "/events/$slug": {
-      "filePath": "events/$slug.tsx"
-    },
-    "/locations/$id": {
-      "filePath": "locations/$id.tsx"
-    },
-    "/calendar/$year/$month": {
-      "filePath": "calendar/$year/$month.tsx"
-    }
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }
-ROUTE_MANIFEST_END */

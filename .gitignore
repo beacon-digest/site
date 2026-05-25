@@ -3,8 +3,12 @@ node_modules
 .env.local
 cursor-notes
 .netlify/functions-internal
+dist
 .output
 .vinxi
+.nitro
+.tanstack
+.tanstack-client
 .netlify
 app.config.timestamp_*
 package-lock.json

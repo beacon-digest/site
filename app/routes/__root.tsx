@@ -5,7 +5,9 @@ import {
   Outlet,
   Scripts,
   createRootRouteWithContext,
+  useRouterState,
 } from "@tanstack/react-router";
+import { AuthKitProvider } from "@workos/authkit-tanstack-react-start/client";
 import type { ReactNode } from "react";
 import mantineCssUrl from "@mantine/core/styles.css?url";
 import appCssUrl from "../styles/app.css?url";
@@ -94,13 +96,23 @@ export const Route = createRootRouteWithContext<{
 });
 
 function RootComponent() {
+  const isAdmin = useRouterState({
+    select: (s) => s.location.pathname.startsWith("/admin"),
+  });
+
   return (
     <RootDocument>
       <MantineProvider theme={theme}>
         <ScrollToTop />
-        <Layout>
-          <Outlet />
-        </Layout>
+        {isAdmin ? (
+          <AuthKitProvider>
+            <Outlet />
+          </AuthKitProvider>
+        ) : (
+          <Layout>
+            <Outlet />
+          </Layout>
+        )}
       </MantineProvider>
     </RootDocument>
   );

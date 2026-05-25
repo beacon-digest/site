@@ -13,6 +13,7 @@ export const searchEvents = createServerFn()
     let baseQuery = database
       .selectFrom("events")
       .leftJoin("locations", "events.location_id", "locations.id")
+      .where("events.status", "=", "published")
       .where("start_at", ">=", now);
 
     if (q) {

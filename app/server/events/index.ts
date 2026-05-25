@@ -43,6 +43,7 @@ export const getEvents = createServerFn()
       return database
         .selectFrom("events")
         .leftJoin("locations", "events.location_id", "locations.id")
+        .where("events.status", "=", "published")
         .select([
           "events.id",
           "events.name",
@@ -131,6 +132,7 @@ export const getMonthEvents = createServerFn()
       return database
         .selectFrom("events")
         .leftJoin("locations", "events.location_id", "locations.id")
+        .where("events.status", "=", "published")
         .select([
           "events.id",
           "events.name",
@@ -216,6 +218,7 @@ export const getDateRangeEvents = createServerFn()
       return database
         .selectFrom("events")
         .leftJoin("locations", "events.location_id", "locations.id")
+        .where("events.status", "=", "published")
         .select([
           "events.id",
           "events.name",

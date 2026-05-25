@@ -26,6 +26,7 @@ export const getEvent = createServerFn()
         "locations.address as location_address",
       ])
       .where("events.id", "=", id)
+      .where("events.status", "=", "published")
       .executeTakeFirst();
 
     if (!event) throw new Error("Event not found");

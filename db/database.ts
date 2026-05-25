@@ -2,6 +2,8 @@ import { Kysely, Generated } from "kysely";
 import { NeonDialect } from "kysely-neon";
 import ws from "ws";
 
+export type EventStatus = "published" | "pending" | "rejected";
+
 export interface EventsTable {
   id: Generated<number>;
   name: string | null;
@@ -14,6 +16,10 @@ export interface EventsTable {
   start_at: Date | null;
   end_at: Date | null;
   created_at: Generated<Date>;
+  // WorkOS organization id of the owning business; NULL = platform/staff-owned.
+  organization_id: string | null;
+  status: Generated<EventStatus>;
+  admin_locked: Generated<boolean>;
 }
 
 export interface LocationsTable {

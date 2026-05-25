@@ -11,11 +11,17 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as LocationsIdRouteImport } from './routes/locations/$id'
 import { Route as EventsSlugRouteImport } from './routes/events/$slug'
 import { Route as CalendarDateRouteImport } from './routes/calendar/$date'
 import { Route as CalendarYearMonthRouteImport } from './routes/calendar/$year/$month'
+import { Route as ApiAuthSignInRouteImport } from './routes/api/auth/sign-in'
+import { Route as ApiAuthCallbackRouteImport } from './routes/api/auth/callback'
+import { Route as AdminEventsNewRouteImport } from './routes/admin/events/new'
+import { Route as AdminEventsIdRouteImport } from './routes/admin/events/$id'
 
 const SearchRoute = SearchRouteImport.update({
   id: '/search',
@@ -27,10 +33,20 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRouteRoute = AdminRouteRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AdminIndexRoute = AdminIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const LocationsIdRoute = LocationsIdRouteImport.update({
   id: '/locations/$id',
@@ -52,14 +68,40 @@ const CalendarYearMonthRoute = CalendarYearMonthRouteImport.update({
   path: '/calendar/$year/$month',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthSignInRoute = ApiAuthSignInRouteImport.update({
+  id: '/api/auth/sign-in',
+  path: '/api/auth/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthCallbackRoute = ApiAuthCallbackRouteImport.update({
+  id: '/api/auth/callback',
+  path: '/api/auth/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEventsNewRoute = AdminEventsNewRouteImport.update({
+  id: '/events/new',
+  path: '/events/new',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminEventsIdRoute = AdminEventsIdRouteImport.update({
+  id: '/events/$id',
+  path: '/events/$id',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/events/new': typeof AdminEventsNewRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 export interface FileRoutesByTo {
@@ -69,27 +111,44 @@ export interface FileRoutesByTo {
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/admin': typeof AdminIndexRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/events/new': typeof AdminEventsNewRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRouteRouteWithChildren
   '/about': typeof AboutRoute
   '/search': typeof SearchRoute
   '/calendar/$date': typeof CalendarDateRoute
   '/events/$slug': typeof EventsSlugRoute
   '/locations/$id': typeof LocationsIdRoute
+  '/admin/': typeof AdminIndexRoute
+  '/admin/events/$id': typeof AdminEventsIdRoute
+  '/admin/events/new': typeof AdminEventsNewRoute
+  '/api/auth/callback': typeof ApiAuthCallbackRoute
+  '/api/auth/sign-in': typeof ApiAuthSignInRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/about'
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
     | '/locations/$id'
+    | '/admin/'
+    | '/admin/events/$id'
+    | '/admin/events/new'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
     | '/calendar/$year/$month'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,25 +158,39 @@ export interface FileRouteTypes {
     | '/calendar/$date'
     | '/events/$slug'
     | '/locations/$id'
+    | '/admin'
+    | '/admin/events/$id'
+    | '/admin/events/new'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
     | '/calendar/$year/$month'
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/about'
     | '/search'
     | '/calendar/$date'
     | '/events/$slug'
     | '/locations/$id'
+    | '/admin/'
+    | '/admin/events/$id'
+    | '/admin/events/new'
+    | '/api/auth/callback'
+    | '/api/auth/sign-in'
     | '/calendar/$year/$month'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   SearchRoute: typeof SearchRoute
   CalendarDateRoute: typeof CalendarDateRoute
   EventsSlugRoute: typeof EventsSlugRoute
   LocationsIdRoute: typeof LocationsIdRoute
+  ApiAuthCallbackRoute: typeof ApiAuthCallbackRoute
+  ApiAuthSignInRoute: typeof ApiAuthSignInRoute
   CalendarYearMonthRoute: typeof CalendarYearMonthRoute
 }
 
@@ -137,12 +210,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/admin/': {
+      id: '/admin/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/locations/$id': {
       id: '/locations/$id'
@@ -172,16 +259,63 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CalendarYearMonthRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/sign-in': {
+      id: '/api/auth/sign-in'
+      path: '/api/auth/sign-in'
+      fullPath: '/api/auth/sign-in'
+      preLoaderRoute: typeof ApiAuthSignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/callback': {
+      id: '/api/auth/callback'
+      path: '/api/auth/callback'
+      fullPath: '/api/auth/callback'
+      preLoaderRoute: typeof ApiAuthCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/events/new': {
+      id: '/admin/events/new'
+      path: '/events/new'
+      fullPath: '/admin/events/new'
+      preLoaderRoute: typeof AdminEventsNewRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/admin/events/$id': {
+      id: '/admin/events/$id'
+      path: '/events/$id'
+      fullPath: '/admin/events/$id'
+      preLoaderRoute: typeof AdminEventsIdRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
   }
 }
 
+interface AdminRouteRouteChildren {
+  AdminIndexRoute: typeof AdminIndexRoute
+  AdminEventsIdRoute: typeof AdminEventsIdRoute
+  AdminEventsNewRoute: typeof AdminEventsNewRoute
+}
+
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminIndexRoute: AdminIndexRoute,
+  AdminEventsIdRoute: AdminEventsIdRoute,
+  AdminEventsNewRoute: AdminEventsNewRoute,
+}
+
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   SearchRoute: SearchRoute,
   CalendarDateRoute: CalendarDateRoute,
   EventsSlugRoute: EventsSlugRoute,
   LocationsIdRoute: LocationsIdRoute,
+  ApiAuthCallbackRoute: ApiAuthCallbackRoute,
+  ApiAuthSignInRoute: ApiAuthSignInRoute,
   CalendarYearMonthRoute: CalendarYearMonthRoute,
 }
 export const routeTree = rootRouteImport

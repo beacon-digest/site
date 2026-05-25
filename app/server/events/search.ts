@@ -4,7 +4,7 @@ import { getDatabase } from "../../../db/database";
 const PAGE_SIZE = 25;
 
 export const searchEvents = createServerFn()
-  .validator((data: { q?: string; locationIds?: number[]; page?: number }) => data)
+  .inputValidator((data: { q?: string; locationIds?: number[]; page?: number }) => data)
   .handler(async ({ data: { q, locationIds, page = 0 } }) => {
     const database = getDatabase();
 

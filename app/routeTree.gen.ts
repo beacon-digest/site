@@ -8,118 +8,50 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as LocationsIdRouteImport } from './routes/locations/$id'
+import { Route as EventsSlugRouteImport } from './routes/events/$slug'
+import { Route as CalendarDateRouteImport } from './routes/calendar/$date'
+import { Route as CalendarYearMonthRouteImport } from './routes/calendar/$year/$month'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as SearchImport } from './routes/search'
-import { Route as AboutImport } from './routes/about'
-import { Route as IndexImport } from './routes/index'
-import { Route as EventsSlugImport } from './routes/events/$slug'
-import { Route as LocationsIdImport } from './routes/locations/$id'
-import { Route as CalendarDateImport } from './routes/calendar/$date'
-import { Route as CalendarYearMonthImport } from './routes/calendar/$year/$month'
-
-// Create/Update Routes
-
-const SearchRoute = SearchImport.update({
+const SearchRoute = SearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const AboutRoute = AboutImport.update({
+const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const EventsSlugRoute = EventsSlugImport.update({
-  id: '/events/$slug',
-  path: '/events/$slug',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const LocationsIdRoute = LocationsIdImport.update({
+const LocationsIdRoute = LocationsIdRouteImport.update({
   id: '/locations/$id',
   path: '/locations/$id',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CalendarDateRoute = CalendarDateImport.update({
+const EventsSlugRoute = EventsSlugRouteImport.update({
+  id: '/events/$slug',
+  path: '/events/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CalendarDateRoute = CalendarDateRouteImport.update({
   id: '/calendar/$date',
   path: '/calendar/$date',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const CalendarYearMonthRoute = CalendarYearMonthImport.update({
+const CalendarYearMonthRoute = CalendarYearMonthRouteImport.update({
   id: '/calendar/$year/$month',
   path: '/calendar/$year/$month',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutImport
-      parentRoute: typeof rootRoute
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchImport
-      parentRoute: typeof rootRoute
-    }
-    '/calendar/$date': {
-      id: '/calendar/$date'
-      path: '/calendar/$date'
-      fullPath: '/calendar/$date'
-      preLoaderRoute: typeof CalendarDateImport
-      parentRoute: typeof rootRoute
-    }
-    '/events/$slug': {
-      id: '/events/$slug'
-      path: '/events/$slug'
-      fullPath: '/events/$slug'
-      preLoaderRoute: typeof EventsSlugImport
-      parentRoute: typeof rootRoute
-    }
-    '/locations/$id': {
-      id: '/locations/$id'
-      path: '/locations/$id'
-      fullPath: '/locations/$id'
-      preLoaderRoute: typeof LocationsIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/calendar/$year/$month': {
-      id: '/calendar/$year/$month'
-      path: '/calendar/$year/$month'
-      fullPath: '/calendar/$year/$month'
-      preLoaderRoute: typeof CalendarYearMonthImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -130,7 +62,6 @@ export interface FileRoutesByFullPath {
   '/locations/$id': typeof LocationsIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
@@ -140,9 +71,8 @@ export interface FileRoutesByTo {
   '/locations/$id': typeof LocationsIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/search': typeof SearchRoute
@@ -151,7 +81,6 @@ export interface FileRoutesById {
   '/locations/$id': typeof LocationsIdRoute
   '/calendar/$year/$month': typeof CalendarYearMonthRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -182,7 +111,6 @@ export interface FileRouteTypes {
     | '/calendar/$year/$month'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
@@ -191,6 +119,60 @@ export interface RootRouteChildren {
   EventsSlugRoute: typeof EventsSlugRoute
   LocationsIdRoute: typeof LocationsIdRoute
   CalendarYearMonthRoute: typeof CalendarYearMonthRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/locations/$id': {
+      id: '/locations/$id'
+      path: '/locations/$id'
+      fullPath: '/locations/$id'
+      preLoaderRoute: typeof LocationsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$slug': {
+      id: '/events/$slug'
+      path: '/events/$slug'
+      fullPath: '/events/$slug'
+      preLoaderRoute: typeof EventsSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendar/$date': {
+      id: '/calendar/$date'
+      path: '/calendar/$date'
+      fullPath: '/calendar/$date'
+      preLoaderRoute: typeof CalendarDateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/calendar/$year/$month': {
+      id: '/calendar/$year/$month'
+      path: '/calendar/$year/$month'
+      fullPath: '/calendar/$year/$month'
+      preLoaderRoute: typeof CalendarYearMonthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -202,47 +184,15 @@ const rootRouteChildren: RootRouteChildren = {
   LocationsIdRoute: LocationsIdRoute,
   CalendarYearMonthRoute: CalendarYearMonthRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
 
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/about",
-        "/search",
-        "/calendar/$date",
-        "/events/$slug",
-        "/locations/$id",
-        "/calendar/$year/$month"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/about": {
-      "filePath": "about.tsx"
-    },
-    "/search": {
-      "filePath": "search.tsx"
-    },
-    "/calendar/$date": {
-      "filePath": "calendar/$date.tsx"
-    },
-    "/events/$slug": {
-      "filePath": "events/$slug.tsx"
-    },
-    "/locations/$id": {
-      "filePath": "locations/$id.tsx"
-    },
-    "/calendar/$year/$month": {
-      "filePath": "calendar/$year/$month.tsx"
-    }
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
   }
 }
-ROUTE_MANIFEST_END */

@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { getDatabase } from "../../../db/database";
 
 export const getEvent = createServerFn()
-  .validator((id: number) => id)
+  .inputValidator((id: number) => id)
   .handler(async ({ data: id }) => {
     const database = getDatabase();
 

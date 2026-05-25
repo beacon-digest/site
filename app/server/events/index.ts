@@ -10,7 +10,7 @@ import {
 } from "date-fns";
 
 export const getEvents = createServerFn()
-  .validator((date: string) => date)
+  .inputValidator((date: string) => date)
   .handler(async ({ data: date }) => {
     const database = getDatabase();
 
@@ -91,7 +91,7 @@ export const getEvents = createServerFn()
   });
 
 export const getMonthEvents = createServerFn()
-  .validator((month: string) => month)
+  .inputValidator((month: string) => month)
   .handler(async ({ data: month }) => {
     const database = getDatabase();
 
@@ -179,7 +179,7 @@ export const getMonthEvents = createServerFn()
   });
 
 export const getDateRangeEvents = createServerFn()
-  .validator((data: { startDate: string; endDate: string }) => data)
+  .inputValidator((data: { startDate: string; endDate: string }) => data)
   .handler(async ({ data: { startDate, endDate } }) => {
     const database = getDatabase();
 

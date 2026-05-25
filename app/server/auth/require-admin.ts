@@ -64,7 +64,7 @@ export async function resolveAdminAuth(): Promise<AdminAuth | null> {
 
 /** Loader-safe wrapper (callable during client-side navigation via RPC). */
 export const getAdminAuth = createServerFn({ method: "GET" }).handler(
-  resolveAdminAuth,
+  async () => resolveAdminAuth(),
 );
 
 /** For route loaders: redirect to sign-in when the visitor is not a staff admin. */

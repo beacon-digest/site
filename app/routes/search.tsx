@@ -20,6 +20,7 @@ import { searchEvents } from "../server/events/search";
 import { getLocations } from "../server/locations";
 import { Event } from "../components/Event";
 import { groupEventsByDate } from "../utils/groupEventsByDate";
+import { titleMeta } from "../utils/meta";
 
 const PAGE_SIZE = 25;
 
@@ -226,4 +227,7 @@ export const Route = createFileRoute("/search")({
   loaderDeps: ({ search: { q, locations, page } }) => ({ q, locations, page }),
   loader,
   component: SearchContainer,
+  head: () => ({
+    meta: titleMeta("Search Events"),
+  }),
 });

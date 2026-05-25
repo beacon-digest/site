@@ -11,6 +11,7 @@ import { getLocation } from "../../server/locations/show";
 import { Event } from "../../components/Event";
 import { GoogleMap } from "../../components/GoogleMap";
 import { groupEventsByDate } from "../../utils/groupEventsByDate";
+import { titleMeta } from "../../utils/meta";
 
 const PAGE_SIZE = 25;
 
@@ -170,4 +171,7 @@ export const Route = createFileRoute("/locations/$id")({
   loaderDeps: ({ search: { q, page } }) => ({ q, page }),
   loader,
   component: LocationContainer,
+  head: ({ loaderData }) => ({
+    meta: titleMeta(loaderData?.location?.name ?? "Location"),
+  }),
 });

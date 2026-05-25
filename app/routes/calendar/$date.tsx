@@ -3,6 +3,7 @@ import { Home } from "../../components/Home";
 import { getEvents, getMonthEvents } from "../../server/events";
 import { formatInTimeZone } from "date-fns-tz";
 import { format, parseISO } from "date-fns";
+import { titleMeta } from "../../utils/meta";
 
 const loader = async ({ params }: { params: { date: string } }) => {
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -37,11 +38,11 @@ export const Route = createFileRoute("/calendar/$date")({
   loader,
   head: ({ params }) => {
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-    const title = dateRegex.test(params.date)
-      ? `Events on ${format(parseISO(params.date), "EEEE, MMMM d, yyyy")} | Beacon Digest`
-      : "Beacon Digest";
+    const page = dateRegex.test(params.date)
+      ? `Events on ${format(parseISO(params.date), "EEEE, MMMM d, yyyy")}`
+      : undefined;
 
-    return { meta: [{ title }] };
+    return { meta: titleMeta(page) };
   },
   beforeLoad: ({ params }) => {
     const dateRegex = /^\d{4}-\d{2}-\d{2}$/;

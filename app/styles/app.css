@@ -7,6 +7,18 @@
   --font-libre-franklin: "Libre Franklin", sans-serif;
 }
 
+::selection {
+  background-color: var(--color-rose-100);
+  color: var(--color-rose-900);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--color-rose-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* Hide scrollbar for Chrome, Safari and Opera */
 .scrollbar-hidden::-webkit-scrollbar {
   display: none;

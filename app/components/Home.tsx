@@ -72,7 +72,7 @@ export const Home: React.FC<HomeProps> = ({
 
       {/* Content area with visual separation from nav */}
       <div
-        className={`${viewMode === "list" ? "border-t border-gray-300" : ""} pt-4 mt-2`}
+        className="pt-4 mt-2"
       >
         <ViewToggle currentView={viewMode} />
 
@@ -82,7 +82,9 @@ export const Home: React.FC<HomeProps> = ({
           <div
             style={{
               opacity: fadeOut ? 0 : 1,
-              transition: "opacity 0.3s ease-in-out",
+              transform: fadeOut ? "translateY(4px)" : "translateY(0)",
+              transition:
+                "opacity 0.3s ease-in-out, transform 0.3s ease-in-out",
             }}
           >
             {displayedEvents.length === 0 ? (

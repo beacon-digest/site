@@ -1,19 +1,30 @@
 .event-description {
+  color: var(--color-gray-700);
+
   a {
-    color: var(--color-blue-500);
+    color: var(--color-rose-700);
     font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--color-rose-200);
+    text-underline-offset: 2px;
+    transition: text-decoration-color 0.2s;
+
+    &:hover {
+      text-decoration-color: var(--color-rose-700);
+    }
   }
 
   p {
-    font-size: 1rem;
-    margin: 0.75rem 0;
-    line-height: 1.5;
+    font-size: 1.0625rem;
+    margin: 0.875rem 0;
+    line-height: 1.7;
   }
 
   @media (min-width: 768px) {
     p {
-      font-size: 1.2rem;
-      margin: 1rem 0;
+      font-size: 1.1875rem;
+      margin: 1.125rem 0;
+      line-height: 1.75;
     }
   }
 }

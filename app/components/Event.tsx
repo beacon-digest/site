@@ -11,11 +11,13 @@ interface EventProps {
 
 export const Event: React.FC<EventProps> = ({ event, isFirst = false }) => {
   return (
-    <Link to="/events/$slug" params={{ slug: `${event.id}-${event.slug}` }}>
-      <div
-        className={`${isFirst ? "" : "border-t"} border-gray-300 pb-6 md:pb-10 pt-2`}
-      >
-        <div className="grid grid-cols-[auto_1fr] md:grid-cols-[auto_minmax(180px,1fr)_300px_auto] items-center gap-4 md:gap-10">
+    <Link
+      to="/events/$slug"
+      params={{ slug: `${event.id}-${event.slug}` }}
+      className="group"
+    >
+      <div className="rounded-xl p-4 md:p-6 mb-3 md:mb-4 transition-all duration-200 ease-in-out hover:bg-gray-50 hover:shadow-sm">
+        <div className="grid grid-cols-[auto_1fr] md:grid-cols-[auto_minmax(180px,1fr)_300px_auto] items-center gap-3 md:gap-6">
           <EmojiBox emoji={event.emoji ?? ""} />
 
           <div className="flex flex-col gap-0 min-w-0 overflow-hidden">
@@ -46,33 +48,36 @@ export const Event: React.FC<EventProps> = ({ event, isFirst = false }) => {
             )}
           </div>
 
-          <span className="hidden md:flex text-red-600 text-xl items-center gap-1 whitespace-nowrap">
+          <span className="hidden md:flex text-rose-700 text-base font-semibold items-center gap-1.5 whitespace-nowrap px-4 py-2 rounded-full border border-rose-200 bg-rose-50 transition-all duration-200 group-hover:bg-rose-700 group-hover:text-white group-hover:border-rose-700">
             Learn more
-            <IconArrowRight className="text-black" />
+            <IconArrowRight
+              size={16}
+              className="text-rose-700 group-hover:text-white transition-colors duration-200"
+            />
           </span>
         </div>
 
         {/* Mobile-only location and learn more */}
-        <div className="mt-4 flex flex-col gap-2 md:hidden">
+        <div className="mt-3 flex flex-col gap-2 md:hidden">
           {event.location && (
             <>
               {event.location.name && (
-                <div className="text-gray-800 text-base">
+                <div className="text-gray-800 text-sm">
                   {event.location.name}
                 </div>
               )}
 
               {event.location.address && (
-                <div className="text-gray-500 text-base">
+                <div className="text-gray-500 text-sm">
                   {event.location.address}
                 </div>
               )}
             </>
           )}
 
-          <span className="text-red-600 text-base flex items-center gap-1 whitespace-nowrap mt-2">
+          <span className="text-rose-700 text-sm font-semibold flex items-center gap-1.5 whitespace-nowrap px-3 py-1.5 rounded-full border border-rose-200 bg-rose-50 self-start mt-1">
             Learn more
-            <IconArrowRight className="text-black" size={18} />
+            <IconArrowRight size={14} className="text-rose-700" />
           </span>
         </div>
       </div>

@@ -1,10 +1,10 @@
-import { ActionIcon, Group, Paper, rem } from "@mantine/core";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   addDays,
   differenceInWeeks,
   format,
   isToday,
+  isSameMonth,
   parseISO,
   startOfWeek,
 } from "date-fns";
@@ -55,7 +55,6 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
   };
 
   const [weekOffset, setWeekOffset] = useState(calculateInitialOffset);
-  const [hoveredDay, setHoveredDay] = useState<string | null>(null);
 
   // In desktop view, use weeks. In mobile view, use a reference date with selected date in the middle
   const baseDate = isMobile
@@ -65,11 +64,14 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
     : startOfWeek(addDays(new Date(), weekOffset * 7));
 
   const daysToDisplay = isMobile ? 3 : 7;
+  const lastDate = addDays(baseDate, daysToDisplay - 1);
+
+  // Month/year label
+  const monthLabel = isSameMonth(baseDate, lastDate)
+    ? format(baseDate, "MMMM yyyy")
+    : `${format(baseDate, "MMM")} – ${format(lastDate, "MMM yyyy")}`;
 
   const handlePreviousWeek = () => {
-    // Calculate the navigation target based on screen size
-    const step = isMobile ? 3 : 7;
-
     if (!isMobile) {
       setWeekOffset((prev) => prev - 1);
     }
@@ -84,9 +86,6 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
   };
 
   const handleNextWeek = () => {
-    // Calculate the navigation target based on screen size
-    const step = isMobile ? 3 : 7;
-
     if (!isMobile) {
       setWeekOffset((prev) => prev + 1);
     }
@@ -105,6 +104,7 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
     const path = isToday(date) ? "/" : `/calendar/${formattedDate}`;
 
     const isCurrentDay = formattedDate === selectedDate;
+    const isTodayDate = isToday(date);
 
     return (
       <Link
@@ -112,53 +112,53 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
         to={path}
         style={{ textDecoration: "none", width: "100%", minWidth: "80px" }}
       >
-        <Paper
-          p="xs"
-          onMouseEnter={() => setHoveredDay(formattedDate)}
-          onMouseLeave={() => setHoveredDay(null)}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: isCurrentDay
-              ? "#e9ecef"
-              : hoveredDay === formattedDate
-                ? "#f8f9fa"
-                : "white",
-            width: { base: "100px", md: "auto" },
-            maxWidth: { base: "none", md: "120px" },
-            margin: "0 auto",
-            cursor: "pointer",
-            transition: "background-color 0.2s ease",
-            minHeight: "74px",
-            border: isCurrentDay ? "1px solid #dee2e6" : "none",
-            borderRadius: "8px",
-          }}
+        <div
+          className={`flex flex-col items-center justify-center min-h-[74px] rounded-lg cursor-pointer transition-all duration-200 ${
+            isCurrentDay
+              ? "bg-rose-700 text-white shadow-md"
+              : "hover:bg-gray-100"
+          }`}
         >
-          <h2 className="text-center text-lg md:text-3xl mb-0 md:mb-1 font-extrabold">
+          <h2
+            className={`text-center text-lg md:text-3xl mb-0 md:mb-1 font-extrabold ${
+              isCurrentDay ? "text-white" : "text-gray-900"
+            }`}
+          >
             {format(date, "EEE")}
           </h2>
 
-          <span className="text-neutral-500 text-sm md:text-xl text-center w-full">
+          <span
+            className={`text-sm md:text-xl text-center w-full ${
+              isCurrentDay ? "text-rose-100" : "text-gray-500"
+            }`}
+          >
             {format(date, "MMM d")}
           </span>
-        </Paper>
+
+          {isTodayDate && !isCurrentDay && (
+            <div className="w-1.5 h-1.5 rounded-full bg-rose-500 mt-1" />
+          )}
+        </div>
       </Link>
     );
   });
 
   return (
     <div className="relative py-4 md:py-8 px-1 w-full">
+      <div className="text-center mb-2 md:mb-3">
+        <span className="text-sm md:text-base font-semibold text-gray-500 tracking-wide uppercase">
+          {monthLabel}
+        </span>
+      </div>
+
       <div className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 pl-2 md:pl-4">
-        <ActionIcon
-          variant="subtle"
+        <button
           onClick={handlePreviousWeek}
-          size={{ base: "md", md: "lg" }}
-          className="flex-shrink-0"
+          className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-150 text-gray-500 hover:text-gray-700"
+          aria-label="Previous week"
         >
-          <IconChevronLeft />
-        </ActionIcon>
+          <IconChevronLeft size={20} />
+        </button>
       </div>
 
       <div
@@ -168,14 +168,13 @@ export const DayNavbar: React.FC<DayNavbarProps> = ({ selectedDate }) => {
       </div>
 
       <div className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 pr-2 md:pr-4">
-        <ActionIcon
-          variant="subtle"
+        <button
           onClick={handleNextWeek}
-          size={{ base: "md", md: "lg" }}
-          className="flex-shrink-0"
+          className="p-2 rounded-full hover:bg-gray-100 transition-colors duration-150 text-gray-500 hover:text-gray-700"
+          aria-label="Next week"
         >
-          <IconChevronRight />
-        </ActionIcon>
+          <IconChevronRight size={20} />
+        </button>
       </div>
     </div>
   );

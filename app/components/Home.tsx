@@ -103,6 +103,7 @@ export const Home: React.FC<HomeProps> = ({
           </div>
         )}
       </div>
+
     </div>
   );
 };

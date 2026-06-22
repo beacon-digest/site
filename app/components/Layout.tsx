@@ -3,6 +3,7 @@ import { AppShell, Group } from "@mantine/core";
 import { Link, useLocation } from "@tanstack/react-router";
 import { IconSearch } from "@tabler/icons-react";
 import { SearchBar } from "./SearchBar";
+import { EmailSignup } from "./EmailSignup";
 
 interface LayoutProps {
   children: ReactNode;
@@ -43,6 +44,10 @@ export function Layout({ children }: LayoutProps) {
             About
           </Link>
 
+          <Link to="/newsletter" className="text-xs md:text-sm font-semibold">
+            Newsletter
+          </Link>
+
           {/* Mobile-only search icon */}
           {!isSearchPage && (
             <Link to="/search" className="flex items-center md:hidden">
@@ -52,6 +57,20 @@ export function Layout({ children }: LayoutProps) {
         </Group>
       </AppShell.Header>
       <AppShell.Main id="main-scroll-container">{children}</AppShell.Main>
+      <AppShell.Footer
+        className="relative border-t border-neutral-300 bg-neutral-50"
+        styles={{ footer: { position: "relative" } }}
+      >
+        <div className="px-4 md:px-12 py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div className="flex-1 max-w-md">
+            <p className="font-semibold mb-2">Get the weekly digest</p>
+            <EmailSignup compact />
+          </div>
+          <p className="text-sm text-gray-500">
+            Beacon Digest &middot; A free community calendar for Beacon, NY
+          </p>
+        </div>
+      </AppShell.Footer>
     </AppShell>
   );
 }
